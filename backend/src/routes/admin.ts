@@ -39,7 +39,7 @@ adminRouter.get('/stats', async (_req, res: Response) => {
     totalEmployees,
     totalServices,
     activeUsers,
-    planCounts: Object.fromEntries(planCounts.map(p => [p.plan, p._count.plan])),
+    planCounts: Object.fromEntries(planCounts.map((p: { plan: string; _count: { plan: number } }) => [p.plan, p._count.plan])),
     newUsersThisMonth,
     newSalonsThisMonth,
   })
@@ -64,7 +64,7 @@ adminRouter.get('/users', async (req: any, res: Response) => {
     orderBy: { createdAt: 'desc' },
   })
 
-  res.json(users.map(u => ({
+  res.json(users.map((u: typeof users[0]) => ({
     id:           u.id,
     name:         u.name,
     email:        u.email,
