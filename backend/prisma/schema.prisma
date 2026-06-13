@@ -1,0 +1,171 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Country {
+  DE
+  AT
+  CH
+}
+
+enum BusinessType {
+  SOLO
+  GBR
+  GMBH
+}
+
+enum EmployeeRole {
+  FRISEUR
+  ORGA
+  AZUBI
+  CHEF
+}
+
+enum CostCategory {
+  MIETE
+  NEBENKOSTEN
+  STROM
+  WASSER
+  TELEFON
+  INTERNET
+  VERSICHERUNG
+  STEUERBERATUNG
+  BANKGEBUEHREN
+  LEASING
+  REPARATUREN
+  WERBUNG
+  WEITERBILDUNG
+  SONSTIGE
+  ZINSEN
+  TILGUNG
+  WARENEINSATZ
+  UNTERNEHMERLOHN
+}
+
+enum ServiceCategory {
+  WASCHEN_SCHNEIDEN_FOENEN
+  HERRENHAARSCHNITT
+  FARBE
+  STRAEHNEN
+  BALAYAGE
+  VERLAENGERUNG
+  CUSTOM
+}
+
+enum PricingPlan {
+  FREE
+  STARTER
+  PRO
+  STUDIO
+}
+
+model User {
+  id           String      @id @default(cuid())
+  email        String      @unique
+  passwordHash String
+  name         String
+  isAdmin      Boolean     @default(false)
+  isActive     Boolean     @default(true)
+  isDemo       Boolean     @default(false)
+  plan         PricingPlan @default(FREE)
+  planExpiresAt DateTime?
+  notes        String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  salons       Salon[]
+}
+
+model Salon {
+  id             String         @id @default(cuid())
+  userId         String
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name           String
+  country        Country        @default(DE)
+  businessType   BusinessType   @default(SOLO)
+  planStart      DateTime
+  planEnd        DateTime
+  fullTimeHours  Float          @default(38)
+  vacationWeeks  Int            @default(5)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  employees      Employee[]
+  openingHours   OpeningHours[]
+  costItems      CostItem[]
+  services       Service[]
+  actualRevenues ActualRevenue[]
+}
+
+model OpeningHours {
+  id        String @id @default(cuid())
+  salonId   String
+  salon     Salon  @relation(fields: [salonId], references: [id], onDelete: Cascade)
+  weekday   Int
+  openHours Float
+  variant   Int    @default(1)
+}
+
+model Employee {
+  id               String       @id @default(cuid())
+  salonId          String
+  salon            Salon        @relation(fields: [salonId], references: [id], onDelete: Cascade)
+  name             String
+  role             EmployeeRole
+  grossSalary      Float
+  weeklyHours      Float        @default(38)
+  activeMonths     Float[]
+  vacationDays     Int          @default(0)
+  sickDays         Int          @default(0)
+  trainingDays     Int          @default(0)
+  christmasBonus   Float        @default(0)
+  holidayBonus     Float        @default(0)
+  capitalFormation Float        @default(0)
+  taxFreeBonus     Float        @default(0)
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  actualRevenues   ActualRevenue[]
+}
+
+model CostItem {
+  id        String       @id @default(cuid())
+  salonId   String
+  salon     Salon        @relation(fields: [salonId], references: [id], onDelete: Cascade)
+  category  CostCategory
+  label     String
+  amounts   Float[]
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+}
+
+model Service {
+  id              String          @id @default(cuid())
+  salonId         String
+  salon           Salon           @relation(fields: [salonId], references: [id], onDelete: Cascade)
+  category        ServiceCategory
+  name            String
+  durationMinutes Float
+  materialCost    Float           @default(0)
+  utilizationPct  Float           @default(80)
+  profitMarkup    Float           @default(10)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+}
+
+model ActualRevenue {
+  id         String   @id @default(cuid())
+  salonId    String
+  salon      Salon    @relation(fields: [salonId], references: [id], onDelete: Cascade)
+  employeeId String
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  month      Int
+  year       Int
+  actual     Float    @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([employeeId, month, year])
+}
