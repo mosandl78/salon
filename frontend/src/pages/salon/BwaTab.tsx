@@ -166,7 +166,7 @@ export default function BwaTab({ salonId, salon }: { salonId: string; salon: Sal
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
             <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
             <YAxis tickFormatter={v => `${(v/1000).toFixed(0)}k`} tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
-            <Tooltip formatter={(v: number) => `${fmt(v)} €`} />
+            <Tooltip formatter={(v: number | string) => `${fmt(Number(v))} €`} />
             <Legend wrapperStyle={{ fontSize: 12 }} />
             <Bar dataKey="Plan-Kosten" fill="#e5e7eb" radius={[3,3,0,0]} />
             <Bar dataKey="IST-Umsatz"  fill="#374151" radius={[3,3,0,0]} />

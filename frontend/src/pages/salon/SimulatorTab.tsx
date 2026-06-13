@@ -140,7 +140,7 @@ export default function SimulatorTab({ salonId, salon }: { salonId: string; salo
                 <YAxis tickFormatter={v => `${(v/1000).toFixed(0)}k`} tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
                 <Tooltip formatter={(v: number) => `${fmt(v)} €`} />
                 <Bar dataKey="Mindestumsatz" fill="#111827" radius={[4,4,0,0]}
-                  label={{ position: 'top', fontSize: 10, formatter: (v: number) => `${fmt(v)} €` }} />
+                  label={{ position: 'top', fontSize: 10, formatter: (v: unknown) => `${fmt(Number(v))} €` }} />
                 <ReferenceLine y={calc.mindestumsatzNet} stroke="#d1d5db" strokeDasharray="4 4" />
               </BarChart>
             </ResponsiveContainer>

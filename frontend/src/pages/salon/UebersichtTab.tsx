@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { TrendingUp, Users, Euro, AlertCircle } from 'lucide-react'
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts'
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import api from '../../api'
 import type { Salon, CalculationResult, ActualRevenue } from '../../types'
 
@@ -32,7 +32,7 @@ function CustomTooltip({ active, payload, label }: any) {
   )
 }
 
-export default function UebersichtTab({ salonId, salon }: { salonId: string; salon: Salon }) {
+export default function UebersichtTab({ salonId }: { salonId: string; salon: Salon }) {
   const year = new Date().getFullYear()
 
   const { data: calc, isLoading } = useQuery<CalculationResult>({
