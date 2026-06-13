@@ -85,7 +85,7 @@ export default function ControllingTab({ salonId, salon, readOnly = false }: { s
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
             <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
             <YAxis tickFormatter={v => `${(v/1000).toFixed(0)}k`} tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
-            <Tooltip formatter={(v: number) => `${fmt(v)} €`} />
+            <Tooltip formatter={(v: any) => `${fmt(Number(v))} €`} />
             <Legend wrapperStyle={{ fontSize: 12 }} />
             <Line type="monotone" dataKey="Soll" stroke="#d1d5db" strokeWidth={2} dot={false} strokeDasharray="5 5" />
             <Line type="monotone" dataKey="IST"  stroke="#111827" strokeWidth={2} dot={{ r: 3 }} />

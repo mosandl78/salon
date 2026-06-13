@@ -138,7 +138,7 @@ export default function SimulatorTab({ salonId, salon }: { salonId: string; salo
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
                 <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
                 <YAxis tickFormatter={v => `${(v/1000).toFixed(0)}k`} tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
-                <Tooltip formatter={(v: number) => `${fmt(v)} €`} />
+                <Tooltip formatter={(v: any) => `${fmt(Number(v))} €`} />
                 <Bar dataKey="Mindestumsatz" fill="#111827" radius={[4,4,0,0]}
                   label={{ position: 'top', fontSize: 10, formatter: (v: unknown) => `${fmt(Number(v))} €` }} />
                 <ReferenceLine y={calc.mindestumsatzNet} stroke="#d1d5db" strokeDasharray="4 4" />

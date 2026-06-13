@@ -92,7 +92,7 @@ export default function LiquiditaetTab({ salonId, salon }: { salonId: string; sa
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
             <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
             <YAxis tickFormatter={v => `${(v/1000).toFixed(0)}k`} tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
-            <Tooltip formatter={(v: number) => `${fmt(v)} €`} />
+            <Tooltip formatter={(v: any) => `${fmt(Number(v))} €`} />
             <Legend wrapperStyle={{ fontSize: 12 }} />
             <Area type="monotone" dataKey="Personalkosten"  stackId="1" stroke="#1f2937" fill="#1f2937" fillOpacity={0.8} />
             <Area type="monotone" dataKey="Gemeinkosten"    stackId="1" stroke="#6b7280" fill="#6b7280" fillOpacity={0.8} />
