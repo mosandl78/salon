@@ -668,7 +668,7 @@ Zwischen Hero und Features gibt es eine neue Sektion mit dunklem Hintergrund (`b
 
 ### Pricing-Messaging
 
-Free-Trial-Kommunikation wurde vollständig entfernt. Aktuell gültige Preisangabe: **99 € / Jahr, netto zzgl. MwSt., sofort aktiv**. Alle CTA-Buttons (LandingPage, RegisterPage, DemoPage) wurden von "Kostenlos testen" / "14 Tage kostenlos starten" auf **"Jetzt kaufen"** / **"Jetzt kaufen & starten"** geändert.
+Kein Free-Trial. Aktuell gültige Preisangabe: **129 € / Jahr**. CTAs: "Jetzt anmelden" (LandingPage), "Jetzt anmelden & starten" (RegisterPage), "Jetzt kaufen — 129 € / Jahr →" (DemoPage sticky CTA).
 
 ### DemoPage — Tabs
 
@@ -941,32 +941,89 @@ npm run db:studio
 
 ---
 
-## 12. Deployment-Hinweise
+## 12. Deployment
 
-### Umgebungsvariablen (Produktion)
+### Produktionsumgebung
 
-| Variable | Anforderung |
+**Live-URLs:**
+| Dienst | URL |
 |---|---|
-| `DATABASE_URL` | Produktions-PostgreSQL-URL (mit SSL: `?sslmode=require`) |
-| `JWT_SECRET` | Kryptographisch starkes Secret (min. 64 Zeichen); **niemals in Git einchecken** |
-| `PORT` | Vom Hosting-Anbieter vorgegeben (z.B. Render, Railway: `PORT`-Env wird automatisch gesetzt) |
-| `NODE_ENV` | `production` setzen für optimierten Betrieb |
+| Frontend | https://salon.vemix.net |
+| Backend API | https://api-salon.vemix.net/api |
+| Admin | https://salon.vemix.net/admin |
+| Demo | https://salon.vemix.net/demo |
+
+### Infrastruktur
+
+| Komponente | Anbieter | Projekt/Service |
+|---|---|---|
+| Frontend | Vercel (Hobby) | `salon` — Root Dir: `frontend` |
+| Backend | Render (Free) | `salon-backend` |
+| Datenbank | Render PostgreSQL (Free) | `salon-db` |
+| DNS / CDN | Cloudflare | Zone `vemix.net` |
+| Repository | GitHub (Private) | `mosandl78/salon` |
+
+### Cloudflare DNS-Einträge (vemix.net)
+
+| Name | Typ | Ziel | Proxy |
+|---|---|---|---|
+| `salon` | CNAME | `cname.vercel-dns.com` | Proxied (orange) |
+| `api-salon` | CNAME | `salon-backend-xxxx.onrender.com` | DNS only (grau) |
+
+### Umgebungsvariablen
+
+**Vercel (Frontend):**
+| Variable | Wert |
+|---|---|
+| `VITE_API_URL` | `https://api-salon.vemix.net/api` |
+
+**Render (Backend):**
+| Variable | Wert |
+|---|---|
+| `NODE_ENV` | `production` |
+| `PORT` | `4000` |
+| `DATABASE_URL` | automatisch von Render DB |
+| `JWT_SECRET` | automatisch generiert (Render) |
+| `FRONTEND_URL` | `https://salon.vemix.net` |
 
 ### CORS
 
-In `backend/src/index.ts` ist CORS aktuell fest auf `http://localhost:5174` konfiguriert:
+In `backend/src/index.ts` wird CORS dynamisch konfiguriert:
 
 ```ts
-app.use(cors({ origin: 'http://localhost:5174', credentials: true }))
+const allowedOrigins = [
+  'http://localhost:5174',
+  process.env.FRONTEND_URL,
+].filter(Boolean) as string[]
+app.use(cors({ origin: allowedOrigins, credentials: true }))
 ```
 
-Für Produktion muss dies auf die echte Frontend-URL geändert werden. Empfehlung: Über Umgebungsvariable steuern:
+### Deploy-Prozess
 
-```ts
-app.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:5174', credentials: true }))
+**Frontend (Vercel):** Automatischer Deploy bei Push auf `main`.
+
+**Backend (Render):** Automatischer Deploy bei Push auf `main`.  
+Build-Command: `npm install --include=dev && npm run build`  
+Start-Command: `npm run start` (beinhaltet `npx prisma migrate deploy && node dist/src/index.js`)
+
+### Admin anlegen
+
+Nach Erstregistrierung über die App:
+```bash
+# Render → salon-backend → Shell-Tab:
+npx prisma db execute --stdin <<< 'UPDATE "User" SET "isAdmin" = true WHERE email = '"'"'deine@email.de'"'"';'
 ```
 
-### Build
+### Sicherheits-Hinweise
+
+- `helmet()` ist aktiv (sicherheitsrelevante HTTP-Header).
+- `express-rate-limit` ist eingebunden; ggf. auf Auth-Routen konfigurieren.
+- Demo-User (`demo@salon-app.de`) wird automatisch beim ersten `/api/demo`-Aufruf angelegt.
+- Admin-Zugänge nur per SQL oder Render Shell setzbar — keine öffentliche Route.
+- JWT-Token: 30 Tage Laufzeit (Demo-Tokens: 2 Stunden).
+- GitHub-Repository ist **private** gesetzt.
+
+### Build lokal
 
 ```bash
 # Backend kompilieren
@@ -975,23 +1032,5 @@ npm run build --workspace=backend
 
 # Frontend kompilieren
 npm run build --workspace=frontend
-# Output: frontend/dist/ (statische Dateien für CDN oder Nginx)
+# Output: frontend/dist/
 ```
-
-### Migrations bei Deployment
-
-```bash
-# In der Produktionsumgebung (nicht db:push!)
-cd backend
-npx prisma migrate deploy
-```
-
-`migrate deploy` wendet nur bereits generierte Migrations an, ohne interaktive Prompts — geeignet für CI/CD.
-
-### Sicherheits-Hinweise
-
-- `helmet()` ist bereits aktiv (setzt sicherheitsrelevante HTTP-Header).
-- `express-rate-limit` ist im Paket enthalten; ggf. auf Auth-Routen konfigurieren.
-- Demo-User (`demo@salon-app.de`) wird automatisch in der Datenbank angelegt — dies ist gewollt und unbedenklich.
-- Admin-Zugänge (`isAdmin: true`) müssen manuell per Datenbank-Seed oder über Prisma Studio gesetzt werden — es gibt keine öffentliche Route zur Admin-Ernennung.
-- JWT-Token haben 30 Tage Laufzeit (Demo-Tokens: 2 Stunden). Token-Rotation oder Blacklisting ist aktuell nicht implementiert.
