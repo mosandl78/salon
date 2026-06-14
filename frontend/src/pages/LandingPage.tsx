@@ -113,42 +113,41 @@ export default function LandingPage() {
       </header>
 
       {/* Hero + Video */}
-      <section className="bg-gray-950 py-20">
+      <section className="bg-white py-20 border-b border-gray-100">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <div className="inline-flex items-center gap-2 bg-white/10 text-white/80 text-2xl font-bold px-6 py-3 rounded-full mb-6">
+          <div className="inline-flex items-center gap-2 bg-gray-100 text-gray-700 text-2xl font-bold px-6 py-3 rounded-full mb-6">
             <Scissors className="w-5 h-5" /> Preiskalkulation für Friseursalons
           </div>
 
-          <p className="text-base text-gray-400 max-w-2xl mx-auto mb-10">
+          <p className="text-base text-gray-500 max-w-2xl mx-auto mb-10">
             SALON berechnet Lohnfaktor, Sollumsatz und Preise automatisch — auf Basis deiner echten
             Personalkosten und Gemeinkosten. Kein Excel, kein Rätselraten.
           </p>
 
           {/* Video placeholder */}
-          <div className="relative rounded-2xl overflow-hidden bg-gray-900 border border-white/10 aspect-video flex items-center justify-center group cursor-pointer mb-10">
-            <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-950" />
+          <div className="relative rounded-2xl overflow-hidden bg-gray-100 border border-gray-200 aspect-video flex items-center justify-center group cursor-pointer mb-10">
             <div className="relative z-10 flex flex-col items-center gap-4">
-              <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform">
-                <Play className="w-8 h-8 text-gray-900 ml-1" />
+              <div className="w-20 h-20 bg-gray-900 rounded-full flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform">
+                <Play className="w-8 h-8 text-white ml-1" />
               </div>
-              <p className="text-white/60 text-sm">Marketing-Video folgt</p>
+              <p className="text-gray-400 text-sm">Marketing-Video folgt</p>
             </div>
-            <div className="absolute top-4 left-4 bg-white/10 text-white/80 text-xs font-medium px-3 py-1 rounded-full backdrop-blur-sm">
+            <div className="absolute top-4 left-4 bg-white border border-gray-200 text-gray-500 text-xs font-medium px-3 py-1 rounded-full">
               SALON — Produktvideo
             </div>
           </div>
 
           <div className="flex items-center justify-center gap-4 flex-wrap">
             <button onClick={() => navigate('/register')}
-              className="bg-white text-gray-900 px-8 py-3.5 rounded-xl text-base font-semibold hover:bg-gray-100 transition-colors">
+              className="bg-gray-900 text-white px-8 py-3.5 rounded-xl text-base font-semibold hover:bg-gray-800 transition-colors">
               Neuen Salon eröffnen — 129 € / Jahr
             </button>
             <button onClick={() => navigate('/demo')}
-              className="flex items-center gap-2 border border-white/20 text-white/80 px-8 py-3.5 rounded-xl text-base font-medium hover:border-white/50 transition-colors">
+              className="flex items-center gap-2 border border-gray-300 text-gray-600 px-8 py-3.5 rounded-xl text-base font-medium hover:border-gray-400 transition-colors">
               <Play className="w-4 h-4" /> Demo ansehen
             </button>
           </div>
-          <p className="text-xs text-white/30 mt-4">Einmalige Jahreslizenz · netto zzgl. MwSt. · sofort nutzbar</p>
+          <p className="text-xs text-gray-400 mt-4">Einmalige Jahreslizenz · netto zzgl. MwSt. · sofort nutzbar</p>
         </div>
       </section>
 
