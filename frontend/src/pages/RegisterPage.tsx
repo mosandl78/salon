@@ -102,7 +102,7 @@ export default function RegisterPage() {
           <ul className="space-y-3">
             {INCLUDED.map(item => (
               <li key={item} className="flex items-start gap-2.5 text-sm text-gray-300">
-                <CheckCircle className="w-4 h-4 accent-text shrink-0 mt-0.5" />
+                <CheckCircle className="w-4 h-4 text-green-400 shrink-0 mt-0.5" />
                 {item}
               </li>
             ))}

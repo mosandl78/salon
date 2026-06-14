@@ -169,7 +169,7 @@ export default function LandingPage() {
               <ul className="space-y-3">
                 {INCLUDED.map(item => (
                   <li key={item} className="flex items-center gap-2.5 text-sm">
-                    <CheckCircle className="w-4 h-4 shrink-0 accent-text" />
+                    <CheckCircle className="w-4 h-4 text-green-400 shrink-0" />
                     <span className="text-gray-200">{item}</span>
                   </li>
                 ))}
