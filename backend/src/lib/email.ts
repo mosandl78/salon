@@ -32,7 +32,7 @@ export async function sendWelcomeMail(to: string, name: string) {
 }
 
 export async function sendContactMail(fromName: string, fromEmail: string, subject: string, message: string) {
-  const CONTACT_TO = process.env.CONTACT_EMAIL ?? 'peter@vemix.net'
+  const CONTACT_TO = process.env.CONTACT_EMAIL ?? 'mosandl@vemix.net'
   await resend.emails.send({
     from: `SALON Kontakt <${FROM}>`,
     to: CONTACT_TO,
