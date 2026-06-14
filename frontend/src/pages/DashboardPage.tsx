@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
-import { Plus, Scissors, LogOut, ChevronRight, Shield, UserCircle } from 'lucide-react'
+import { Plus, Scissors, LogOut, ChevronRight, Shield, UserCircle, Trash2 } from 'lucide-react'
 import api from '../api'
 import type { Salon, Country, BusinessType } from '../types'
 import { useCurrentUser } from '../hooks/useCurrentUser'
@@ -16,7 +16,16 @@ export default function DashboardPage() {
   const navigate     = useNavigate()
   const queryClient  = useQueryClient()
   const [showNew, setShowNew] = useState(false)
+  const [deleteId, setDeleteId] = useState<string | null>(null)
   const { data: currentUser } = useCurrentUser()
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => api.delete(`/salons/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['salons'] })
+      setDeleteId(null)
+    },
+  })
 
   const { data: salons = [], isLoading } = useQuery<Salon[]>({
     queryKey: ['salons'],
@@ -78,16 +87,21 @@ export default function DashboardPage() {
         ) : (
           <div className="space-y-3">
             {salons.map(salon => (
-              <button key={salon.id} onClick={() => navigate(`/salon/${salon.id}`)}
-                className="w-full bg-white border border-gray-200 rounded-2xl p-5 text-left hover:border-gray-400 transition-colors flex items-center justify-between group">
-                <div>
+              <div key={salon.id} className="bg-white border border-gray-200 rounded-2xl p-5 flex items-center justify-between group hover:border-gray-300 transition-colors">
+                <button className="flex-1 text-left" onClick={() => navigate(`/salon/${salon.id}`)}>
                   <p className="font-semibold text-gray-900">{salon.name}</p>
                   <p className="text-sm text-gray-500 mt-0.5">
                     {COUNTRY_LABEL[salon.country]} · {fmt(salon.planStart)} – {fmt(salon.planEnd)}
                   </p>
+                </button>
+                <div className="flex items-center gap-2">
+                  <button onClick={() => setDeleteId(salon.id)}
+                    className="p-2 text-gray-300 hover:text-red-500 transition-colors">
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                  <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-gray-700" />
                 </div>
-                <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-gray-700" />
-              </button>
+              </div>
             ))}
           </div>
         )}
@@ -97,6 +111,27 @@ export default function DashboardPage() {
         queryClient.invalidateQueries({ queryKey: ['salons'] })
         setShowNew(false)
       }} />}
+
+      {deleteId && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6">
+            <h2 className="text-base font-bold text-gray-900 mb-2">Salon löschen?</h2>
+            <p className="text-sm text-gray-500 mb-6">
+              Alle Daten dieses Salons werden unwiderruflich gelöscht — Mitarbeiter, Kosten, Preise, alles.
+            </p>
+            <div className="flex gap-3">
+              <button onClick={() => setDeleteId(null)}
+                className="flex-1 border border-gray-300 text-gray-700 rounded-lg py-2 text-sm hover:bg-gray-50">
+                Abbrechen
+              </button>
+              <button onClick={() => deleteMutation.mutate(deleteId)} disabled={deleteMutation.isPending}
+                className="flex-1 bg-red-600 text-white rounded-lg py-2 text-sm font-medium hover:bg-red-700 disabled:opacity-50">
+                {deleteMutation.isPending ? 'Löschen…' : 'Endgültig löschen'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

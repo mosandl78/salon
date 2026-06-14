@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
 import { ArrowLeft, User, Lock, Trash2 } from 'lucide-react'
@@ -6,20 +6,17 @@ import api from '../api'
 
 export default function AccountPage() {
   const navigate = useNavigate()
-  const raw = localStorage.getItem('salon_token')
-  // Decode JWT payload for initial values
-  let initialName = '', initialEmail = ''
-  try {
-    if (raw) {
-      const payload = JSON.parse(atob(raw.split('.')[1]))
-      initialName  = payload.name  ?? ''
-      initialEmail = payload.email ?? ''
-    }
-  } catch { /* ignore */ }
 
   // Profile
-  const [name, setName]   = useState(initialName)
-  const [email, setEmail] = useState(initialEmail)
+  const [name, setName]   = useState('')
+  const [email, setEmail] = useState('')
+
+  useEffect(() => {
+    api.get('/auth/me').then(r => {
+      setName(r.data.name ?? '')
+      setEmail(r.data.email ?? '')
+    }).catch(() => {})
+  }, [])
   const [profileSaved, setProfileSaved] = useState(false)
   const [profileError, setProfileError] = useState('')
 
