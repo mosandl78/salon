@@ -41,7 +41,7 @@ export default function RegisterPage() {
           <div className="flex items-center gap-2 mb-8">
             <Scissors className="w-5 h-5 text-gray-800" />
             <span className="text-lg font-bold text-gray-900">SALON</span>
-            <span className="text-base text-gray-400" style={{ fontFamily: "'Kaushan Script', cursive" }}>by Peter Lehmann</span>
+            <span className="text-base accent-text" style={{ fontFamily: "'Kaushan Script', cursive" }}>by Peter Lehmann</span>
           </div>
 
           <h1 className="text-2xl font-bold text-gray-900 mb-1">Konto erstellen</h1>

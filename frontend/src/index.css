@@ -1,3 +1,23 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --accent:       #D4848E;
+  --accent-light: #fdf0f1;
+  --accent-dark:  #b86870;
+}
+
+/* Accent utility classes — used throughout the app */
+.accent-text        { color: var(--accent) !important; }
+.accent-bg          { background-color: var(--accent-light) !important; }
+.accent-border      { border-color: var(--accent) !important; }
+.accent-underline   { border-bottom-color: var(--accent) !important; }
+.accent-fill        { fill: var(--accent) !important; }
+
+/* Focus ring override for inputs */
+.accent-focus:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent);
+  border-color: var(--accent) !important;
+}

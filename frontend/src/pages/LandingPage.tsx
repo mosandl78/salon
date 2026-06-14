@@ -51,7 +51,7 @@ function LoginModal({ onClose }: { onClose: () => void }) {
         <div className="flex items-center gap-2 mb-6">
           <Scissors className="w-4 h-4 text-gray-700" />
           <span className="font-bold text-gray-900">SALON</span>
-          <span className="text-sm text-gray-400" style={{ fontFamily: "'Kaushan Script', cursive" }}>by Peter Lehmann</span>
+          <span className="text-sm accent-text" style={{ fontFamily: "'Kaushan Script', cursive" }}>by Peter Lehmann</span>
         </div>
         <h2 className="text-xl font-bold text-gray-900 mb-5">Anmelden</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -93,7 +93,7 @@ export default function LandingPage() {
           <div className="flex items-center gap-2">
             <Scissors className="w-5 h-5 text-gray-800" />
             <span className="text-lg font-bold text-gray-900">SALON</span>
-            <span className="text-base text-gray-400" style={{ fontFamily: "'Kaushan Script', cursive" }}>by Peter Lehmann</span>
+            <span className="text-base accent-text" style={{ fontFamily: "'Kaushan Script', cursive" }}>by Peter Lehmann</span>
           </div>
           <div className="flex items-center gap-3">
             <button onClick={() => navigate('/demo')}
@@ -170,7 +170,7 @@ export default function LandingPage() {
               <ul className="space-y-3">
                 {INCLUDED.map(item => (
                   <li key={item} className="flex items-center gap-2.5 text-sm">
-                    <CheckCircle className="w-4 h-4 text-green-400 shrink-0" />
+                    <CheckCircle className="w-4 h-4 shrink-0 accent-text" />
                     <span className="text-gray-200">{item}</span>
                   </li>
                 ))}
@@ -225,7 +225,7 @@ export default function LandingPage() {
           <div className="flex items-center gap-1.5">
             <Scissors className="w-3.5 h-3.5" />
             <span>SALON</span>
-            <span style={{ fontFamily: "'Kaushan Script', cursive" }}>by Peter Lehmann</span>
+            <span className="accent-text" style={{ fontFamily: "'Kaushan Script', cursive" }}>by Peter Lehmann</span>
           </div>
           <div className="flex items-center gap-4">
             <a href="/kontakt"     className="hover:text-gray-700 transition-colors">Kontakt</a>

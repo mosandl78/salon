@@ -1,11 +1,19 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
-import { ArrowLeft, User, Lock, Trash2 } from 'lucide-react'
+import { ArrowLeft, User, Lock, Trash2, Palette } from 'lucide-react'
 import api from '../api'
+import { THEMES, getTheme, setTheme, type ThemeColor } from '../lib/theme'
 
 export default function AccountPage() {
   const navigate = useNavigate()
+
+  // Theme
+  const [currentTheme, setCurrentTheme] = useState<ThemeColor>(getTheme())
+  function handleTheme(t: ThemeColor) {
+    setCurrentTheme(t)
+    setTheme(t)
+  }
 
   // Profile
   const [name, setName]   = useState('')
@@ -112,6 +120,28 @@ export default function AccountPage() {
               </button>
             </div>
           </form>
+        </div>
+
+        {/* Farbschema */}
+        <div className="bg-white border border-gray-200 rounded-2xl p-6">
+          <h2 className="text-sm font-semibold text-gray-900 mb-5 flex items-center gap-2">
+            <Palette className="w-4 h-4 text-gray-400" /> Farbschema
+          </h2>
+          <div className="flex gap-3">
+            {(Object.entries(THEMES) as [ThemeColor, typeof THEMES[ThemeColor]][]).map(([key, t]) => (
+              <button key={key} onClick={() => handleTheme(key)}
+                className={`flex items-center gap-2.5 px-4 py-2.5 rounded-xl border-2 text-sm font-medium transition-all ${
+                  currentTheme === key
+                    ? 'border-gray-900 bg-gray-50'
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}>
+                <span className="w-4 h-4 rounded-full shrink-0" style={{ background: t.accent }} />
+                {t.label}
+                {currentTheme === key && <span className="text-xs text-gray-400">✓</span>}
+              </button>
+            ))}
+          </div>
+          <p className="text-xs text-gray-400 mt-3">Wird sofort übernommen und gespeichert.</p>
         </div>
 
         {/* Passwort */}
