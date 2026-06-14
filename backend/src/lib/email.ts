@@ -36,7 +36,7 @@ export async function sendContactMail(fromName: string, fromEmail: string, subje
   await resend.emails.send({
     from: `SALON Kontakt <${FROM}>`,
     to: CONTACT_TO,
-    reply_to: fromEmail,
+    replyTo: fromEmail,
     subject: `[SALON Kontakt] ${subject}`,
     html: `
       <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;color:#111">
