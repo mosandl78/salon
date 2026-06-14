@@ -43,8 +43,9 @@ export default function ResetPasswordPage() {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
         <div className="flex items-center gap-2 mb-8 justify-center">
-          <Scissors className="w-5 h-5 text-gray-400" />
-          <span className="font-bold text-gray-900 tracking-tight">SALON</span>
+          <Scissors className="w-5 h-5 text-gray-800" />
+          <span className="text-lg font-bold text-gray-900">SALON</span>
+          <span className="text-base text-gray-400" style={{ fontFamily: "'Kaushan Script', cursive" }}>by Peter Lehmann</span>
         </div>
 
         <div className="bg-white rounded-2xl border border-gray-200 p-8">

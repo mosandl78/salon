@@ -34,10 +34,13 @@ export default function AdminPage() {
           <button onClick={() => navigate('/')} className="text-gray-400 hover:text-gray-700">
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <Shield className="w-4 h-4 text-gray-700" />
-          <div>
-            <h1 className="text-base font-bold text-gray-900 leading-tight">Admin</h1>
-            <p className="text-xs text-gray-400">Systemverwaltung</p>
+          <div className="flex items-center gap-2">
+            <Scissors className="w-5 h-5 text-gray-800" />
+            <span className="text-lg font-bold text-gray-900">SALON</span>
+            <span className="text-base text-gray-400" style={{ fontFamily: "'Kaushan Script', cursive" }}>by Peter Lehmann</span>
+          </div>
+          <div className="flex items-center gap-1.5 text-xs text-gray-400 border border-gray-200 rounded-lg px-2.5 py-1">
+            <Shield className="w-3.5 h-3.5" /> Admin
           </div>
         </div>
       </header>

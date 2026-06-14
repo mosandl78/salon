@@ -43,8 +43,9 @@ export default function DashboardPage() {
       <header className="bg-white border-b border-gray-200 px-6 py-4">
         <div className="max-w-3xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Scissors className="w-5 h-5 text-gray-700" />
+            <Scissors className="w-5 h-5 text-gray-800" />
             <span className="text-lg font-bold text-gray-900">SALON</span>
+            <span className="text-base text-gray-400" style={{ fontFamily: "'Kaushan Script', cursive" }}>by Peter Lehmann</span>
           </div>
           <div className="flex items-center gap-3">
             {currentUser?.isAdmin && (

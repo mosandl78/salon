@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
+import { Scissors } from 'lucide-react'
 import api from '../api'
 
 export default function LoginPage() {
@@ -26,7 +27,11 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="w-full max-w-sm bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-1">SALON</h1>
+        <div className="flex items-center gap-2 mb-6">
+          <Scissors className="w-5 h-5 text-gray-800" />
+          <span className="text-lg font-bold text-gray-900">SALON</span>
+          <span className="text-base text-gray-400" style={{ fontFamily: "'Kaushan Script', cursive" }}>by Peter Lehmann</span>
+        </div>
         <p className="text-sm text-gray-500 mb-6">Preiskalkulation für Friseursalons</p>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>

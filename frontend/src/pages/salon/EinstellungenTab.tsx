@@ -13,7 +13,7 @@ function defaultWeek(hours: number): OHEntry[] {
   return DAYS.map((_, i) => ({ weekday: i, openHours: i < 5 ? hours : 0, variant: 1 }))
 }
 
-export default function EinstellungenTab({ salonId, salon }: { salonId: string; salon: Salon }) {
+export default function EinstellungenTab({ salonId, salon, readOnly }: { salonId: string; salon: Salon; readOnly?: boolean }) {
   const qc = useQueryClient()
   const [saved, setSaved] = useState(false)
 
@@ -89,14 +89,14 @@ export default function EinstellungenTab({ salonId, salon }: { salonId: string; 
         <div className="space-y-4">
           <div>
             <label className="block text-xs font-medium text-gray-700 mb-1">Salonname</label>
-            <input value={salonName} onChange={e => setSalonName(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900" />
+            <input value={salonName} onChange={e => setSalonName(e.target.value)} disabled={readOnly}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 disabled:bg-gray-50 disabled:text-gray-500" />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-1">Land</label>
-              <select value={country} onChange={e => setCountry(e.target.value as Country)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900">
+              <select value={country} onChange={e => setCountry(e.target.value as Country)} disabled={readOnly}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 disabled:bg-gray-50 disabled:text-gray-500">
                 <option value="DE">Deutschland</option>
                 <option value="AT">Österreich</option>
                 <option value="CH">Schweiz</option>
@@ -104,8 +104,8 @@ export default function EinstellungenTab({ salonId, salon }: { salonId: string; 
             </div>
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-1">Betriebsform</label>
-              <select value={businessType} onChange={e => setBusiness(e.target.value as BusinessType)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900">
+              <select value={businessType} onChange={e => setBusiness(e.target.value as BusinessType)} disabled={readOnly}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 disabled:bg-gray-50 disabled:text-gray-500">
                 <option value="SOLO">Solo / Einzelunternehmen</option>
                 <option value="GBR">GbR</option>
                 <option value="GMBH">GmbH / UG</option>
@@ -115,13 +115,13 @@ export default function EinstellungenTab({ salonId, salon }: { salonId: string; 
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-1">Planungsbeginn</label>
-              <input type="date" value={planStart} onChange={e => setPlanStart(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900" />
+              <input type="date" value={planStart} onChange={e => setPlanStart(e.target.value)} disabled={readOnly}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 disabled:bg-gray-50 disabled:text-gray-500" />
             </div>
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-1">Planungsende</label>
-              <input type="date" value={planEnd} onChange={e => setPlanEnd(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900" />
+              <input type="date" value={planEnd} onChange={e => setPlanEnd(e.target.value)} disabled={readOnly}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 disabled:bg-gray-50 disabled:text-gray-500" />
             </div>
           </div>
         </div>
@@ -143,17 +143,17 @@ export default function EinstellungenTab({ salonId, salon }: { salonId: string; 
                 <span className="text-sm text-gray-700 w-24 shrink-0">{day}</span>
                 <div className="flex gap-2 flex-wrap">
                   <button
-                    onClick={() => setDayHours(i, 0)}
+                    onClick={() => !readOnly && setDayHours(i, 0)}
                     className={`px-3 py-1 text-xs rounded-lg border font-medium transition-colors ${
                       val === 0 ? 'bg-gray-200 text-gray-700 border-gray-300' : 'bg-white text-gray-400 border-gray-200 hover:border-gray-300'
-                    }`}>
+                    } ${readOnly ? 'cursor-default' : ''}`}>
                     Ruhetag
                   </button>
                   {HOUR_OPTIONS.filter(h => h > 0).map(h => (
-                    <button key={h} onClick={() => setDayHours(i, h)}
+                    <button key={h} onClick={() => !readOnly && setDayHours(i, h)}
                       className={`px-3 py-1 text-xs rounded-lg border font-medium transition-colors ${
                         val === h ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-400 border-gray-200 hover:border-gray-400'
-                      }`}>
+                      } ${readOnly ? 'cursor-default' : ''}`}>
                       {h}h
                     </button>
                   ))}
@@ -188,8 +188,8 @@ export default function EinstellungenTab({ salonId, salon }: { salonId: string; 
             <label className="block text-xs font-medium text-gray-700 mb-1">
               Vollzeit-Stunden / Woche (Tarif)
             </label>
-            <select value={fullTimeHours} onChange={e => setFullTime(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900">
+            <select value={fullTimeHours} onChange={e => setFullTime(e.target.value)} disabled={readOnly}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 disabled:bg-gray-50 disabled:text-gray-500">
               {[35, 37.5, 38, 38.5, 39, 40].map(h => (
                 <option key={h} value={h}>{h} Stunden</option>
               ))}
@@ -200,8 +200,8 @@ export default function EinstellungenTab({ salonId, salon }: { salonId: string; 
             <label className="block text-xs font-medium text-gray-700 mb-1">
               Betriebsferien (Wochen / Jahr)
             </label>
-            <select value={vacationWeeks} onChange={e => setVacation(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900">
+            <select value={vacationWeeks} onChange={e => setVacation(e.target.value)} disabled={readOnly}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 disabled:bg-gray-50 disabled:text-gray-500">
               {[0, 1, 2, 3, 4, 5, 6, 7, 8].map(w => (
                 <option key={w} value={w}>{w} {w === 1 ? 'Woche' : 'Wochen'}</option>
               ))}
@@ -212,7 +212,7 @@ export default function EinstellungenTab({ salonId, salon }: { salonId: string; 
       </div>
 
       {/* Save */}
-      <div className="flex justify-end">
+      {!readOnly && <div className="flex justify-end">
         <button onClick={handleSave} disabled={ohMutation.isPending || salonMutation.isPending}
           className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-colors ${
             saved
@@ -222,7 +222,7 @@ export default function EinstellungenTab({ salonId, salon }: { salonId: string; 
           <Save className="w-4 h-4" />
           {saved ? 'Gespeichert ✓' : ohMutation.isPending ? 'Speichern…' : 'Einstellungen speichern'}
         </button>
-      </div>
+      </div>}
     </div>
   )
 }

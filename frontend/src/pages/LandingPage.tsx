@@ -152,24 +152,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Features */}
-      <section className="bg-gray-50 py-16">
-        <div className="max-w-5xl mx-auto px-6">
-          <h2 className="text-2xl font-bold text-gray-900 text-center mb-12">Alles was dein Salon braucht</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {FEATURES.map(({ icon: Icon, title, desc }) => (
-              <div key={title} className="bg-white rounded-2xl p-6 border border-gray-200">
-                <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center mb-4">
-                  <Icon className="w-5 h-5 text-gray-700" />
-                </div>
-                <h3 className="font-semibold text-gray-900 mb-2">{title}</h3>
-                <p className="text-sm text-gray-500">{desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Pricing + Register */}
       <section className="py-20" id="register">
         <div className="max-w-5xl mx-auto px-6">
@@ -201,6 +183,24 @@ export default function LandingPage() {
               <p className="text-sm text-gray-400 mb-6">Einmalige Jahreslizenz · netto zzgl. MwSt. · sofort nutzbar</p>
               <RegisterForm />
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features */}
+      <section className="bg-gray-50 py-16">
+        <div className="max-w-5xl mx-auto px-6">
+          <h2 className="text-2xl font-bold text-gray-900 text-center mb-12">Alles was dein Salon braucht</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {FEATURES.map(({ icon: Icon, title, desc }) => (
+              <div key={title} className="bg-white rounded-2xl p-6 border border-gray-200">
+                <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center mb-4">
+                  <Icon className="w-5 h-5 text-gray-700" />
+                </div>
+                <h3 className="font-semibold text-gray-900 mb-2">{title}</h3>
+                <p className="text-sm text-gray-500">{desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>

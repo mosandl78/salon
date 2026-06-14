@@ -14,17 +14,19 @@ import ControllingTab   from './salon/ControllingTab'
 import BwaTab           from './salon/BwaTab'
 import LiquiditaetTab   from './salon/LiquiditaetTab'
 import SimulatorTab     from './salon/SimulatorTab'
+import EinstellungenTab from './salon/EinstellungenTab'
 
 const TABS = [
-  { id: 'uebersicht',  label: 'Übersicht' },
-  { id: 'mitarbeiter', label: 'Mitarbeiter' },
-  { id: 'kosten',      label: 'Kosten' },
-  { id: 'lohnfaktor',  label: 'Lohnfaktor' },
-  { id: 'preise',      label: 'Preise' },
-  { id: 'controlling', label: 'Controlling' },
-  { id: 'bwa',         label: 'BWA' },
-  { id: 'liquiditaet', label: 'Liquidität' },
-  { id: 'simulator',   label: 'Simulator' },
+  { id: 'uebersicht',    label: 'Übersicht' },
+  { id: 'mitarbeiter',   label: 'Mitarbeiter' },
+  { id: 'kosten',        label: 'Kosten' },
+  { id: 'lohnfaktor',    label: 'Lohnfaktor' },
+  { id: 'preise',        label: 'Preise' },
+  { id: 'controlling',   label: 'Controlling' },
+  { id: 'bwa',           label: 'BWA' },
+  { id: 'liquiditaet',   label: 'Liquidität' },
+  { id: 'simulator',     label: 'Simulator' },
+  { id: 'einstellungen', label: 'Einstellungen' },
 ]
 
 export default function DemoPage() {
@@ -82,7 +84,7 @@ export default function DemoPage() {
         </div>
         <button onClick={() => navigate('/register')}
           className="bg-white text-gray-900 text-xs font-semibold px-4 py-1.5 rounded-lg hover:bg-gray-100">
-          Jetzt kaufen →
+          Neuen Salon eröffnen →
         </button>
       </div>
 
@@ -131,7 +133,8 @@ export default function DemoPage() {
         {tab === 'controlling' && <ControllingTab salonId={salonId} salon={salon} readOnly />}
         {tab === 'bwa'         && <BwaTab         salonId={salonId} salon={salon} />}
         {tab === 'liquiditaet' && <LiquiditaetTab salonId={salonId} salon={salon} />}
-        {tab === 'simulator'   && <SimulatorTab   salonId={salonId} salon={salon} />}
+        {tab === 'simulator'     && <SimulatorTab     salonId={salonId} salon={salon} />}
+        {tab === 'einstellungen' && <EinstellungenTab salonId={salonId} salon={salon} readOnly />}
       </div>
 
       {/* Sticky CTA */}
@@ -140,7 +143,7 @@ export default function DemoPage() {
           <span className="text-gray-300">Gefällt dir was du siehst?</span>
           <button onClick={() => navigate('/register')}
             className="bg-white text-gray-900 font-semibold px-4 py-1.5 rounded-lg hover:bg-gray-100 whitespace-nowrap">
-            Jetzt kaufen — 129 € / Jahr →
+            Neuen Salon eröffnen — 129 € / Jahr →
           </button>
         </div>
       </div>

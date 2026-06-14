@@ -12,8 +12,9 @@ export default function DatenschutzPage() {
             <ArrowLeft className="w-4 h-4" /> Zurück
           </button>
           <div className="flex items-center gap-2">
-            <Scissors className="w-4 h-4 text-gray-700" />
-            <span className="font-bold text-gray-900">SALON</span>
+            <Scissors className="w-5 h-5 text-gray-800" />
+            <span className="text-lg font-bold text-gray-900">SALON</span>
+            <span className="text-base text-gray-400" style={{ fontFamily: "'Kaushan Script', cursive" }}>by Peter Lehmann</span>
           </div>
         </div>
       </header>
