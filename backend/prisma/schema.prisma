@@ -74,10 +74,12 @@ model User {
   isDemo       Boolean     @default(false)
   plan         PricingPlan @default(FREE)
   planExpiresAt DateTime?
-  notes        String?
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
-  salons       Salon[]
+  notes             String?
+  resetToken        String?
+  resetTokenExpiry  DateTime?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  salons            Salon[]
 }
 
 model Salon {

@@ -4,10 +4,12 @@ import SalonPage     from './pages/SalonPage'
 import AdminPage     from './pages/AdminPage'
 import LoginPage     from './pages/LoginPage'
 import RegisterPage  from './pages/RegisterPage'
-import LandingPage     from './pages/LandingPage'
-import DemoPage        from './pages/DemoPage'
-import ImpressumPage   from './pages/ImpressumPage'
-import DatenschutzPage from './pages/DatenschutzPage'
+import LandingPage          from './pages/LandingPage'
+import DemoPage             from './pages/DemoPage'
+import ImpressumPage        from './pages/ImpressumPage'
+import DatenschutzPage      from './pages/DatenschutzPage'
+import ForgotPasswordPage   from './pages/ForgotPasswordPage'
+import ResetPasswordPage    from './pages/ResetPasswordPage'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const token = localStorage.getItem('salon_token')
@@ -25,8 +27,10 @@ export default function App() {
       <Route path="/"          element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
       <Route path="/salon/:id" element={<ProtectedRoute><SalonPage /></ProtectedRoute>} />
       <Route path="/admin"       element={<ProtectedRoute><AdminPage /></ProtectedRoute>} />
-      <Route path="/impressum"   element={<ImpressumPage />} />
-      <Route path="/datenschutz" element={<DatenschutzPage />} />
+      <Route path="/impressum"        element={<ImpressumPage />} />
+      <Route path="/datenschutz"      element={<DatenschutzPage />} />
+      <Route path="/forgot-password"  element={<ForgotPasswordPage />} />
+      <Route path="/reset-password"   element={<ResetPasswordPage />} />
     </Routes>
   )
 }
