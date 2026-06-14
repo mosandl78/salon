@@ -81,7 +81,6 @@ export default function RegisterPage() {
 
           <p className="text-xs text-gray-400 mt-4 text-center leading-relaxed">
             Mit der Registrierung stimmst du unseren Nutzungsbedingungen zu.
-            Die Lizenz gilt für ein Jahr ab Aktivierung.
           </p>
 
           <p className="text-sm text-gray-500 mt-6 text-center">

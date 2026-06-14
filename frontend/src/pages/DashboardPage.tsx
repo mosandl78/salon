@@ -34,7 +34,7 @@ export default function DashboardPage() {
 
   function handleLogout() {
     localStorage.removeItem('salon_token')
-    navigate('/login')
+    navigate('/start')
   }
 
   return (
