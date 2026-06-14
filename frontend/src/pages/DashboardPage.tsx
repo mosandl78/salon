@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
-import { Plus, Scissors, LogOut, ChevronRight, Shield } from 'lucide-react'
+import { Plus, Scissors, LogOut, ChevronRight, Shield, UserCircle } from 'lucide-react'
 import api from '../api'
 import type { Salon, Country, BusinessType } from '../types'
 import { useCurrentUser } from '../hooks/useCurrentUser'
@@ -44,6 +44,10 @@ export default function DashboardPage() {
                 <Shield className="w-4 h-4" /> Admin
               </button>
             )}
+            <button onClick={() => navigate('/account')}
+              className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 border border-gray-200 rounded-lg px-3 py-1.5 hover:border-gray-400 transition-colors">
+              <UserCircle className="w-4 h-4" /> Konto
+            </button>
             <button onClick={handleLogout} className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900">
               <LogOut className="w-4 h-4" /> Abmelden
             </button>

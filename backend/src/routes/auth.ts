@@ -51,6 +51,59 @@ authRouter.get('/me', async (req: any, res: Response) => {
   }
 })
 
+// PATCH /api/auth/me — Profil aktualisieren
+authRouter.patch('/me', async (req: any, res: Response) => {
+  const authHeader = req.headers.authorization
+  if (!authHeader?.startsWith('Bearer ')) return res.status(401).json({ error: 'Nicht authentifiziert' })
+  try {
+    const payload = jwt.verify(authHeader.slice(7), process.env.JWT_SECRET!) as { userId: string }
+    const { name, email } = req.body
+    const existing = email ? await prisma.user.findFirst({ where: { email, NOT: { id: payload.userId } } }) : null
+    if (existing) return res.status(409).json({ error: 'E-Mail bereits vergeben' })
+    const user = await prisma.user.update({
+      where: { id: payload.userId },
+      data: { ...(name ? { name } : {}), ...(email ? { email } : {}) },
+    })
+    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!, { expiresIn: '30d' })
+    res.json({ token, user: { id: user.id, email: user.email, name: user.name } })
+  } catch {
+    res.status(401).json({ error: 'Ungültiger Token' })
+  }
+})
+
+// PATCH /api/auth/me/password — Passwort ändern
+authRouter.patch('/me/password', async (req: any, res: Response) => {
+  const authHeader = req.headers.authorization
+  if (!authHeader?.startsWith('Bearer ')) return res.status(401).json({ error: 'Nicht authentifiziert' })
+  try {
+    const payload = jwt.verify(authHeader.slice(7), process.env.JWT_SECRET!) as { userId: string }
+    const { currentPassword, newPassword } = req.body
+    if (!currentPassword || !newPassword) return res.status(400).json({ error: 'Alle Felder erforderlich' })
+    const user = await prisma.user.findUnique({ where: { id: payload.userId } })
+    if (!user) return res.status(404).json({ error: 'Nicht gefunden' })
+    const valid = await bcrypt.compare(currentPassword, user.passwordHash)
+    if (!valid) return res.status(400).json({ error: 'Aktuelles Passwort ist falsch' })
+    const passwordHash = await bcrypt.hash(newPassword, 10)
+    await prisma.user.update({ where: { id: payload.userId }, data: { passwordHash } })
+    res.json({ ok: true })
+  } catch {
+    res.status(401).json({ error: 'Ungültiger Token' })
+  }
+})
+
+// DELETE /api/auth/me — Konto löschen
+authRouter.delete('/me', async (req: any, res: Response) => {
+  const authHeader = req.headers.authorization
+  if (!authHeader?.startsWith('Bearer ')) return res.status(401).json({ error: 'Nicht authentifiziert' })
+  try {
+    const payload = jwt.verify(authHeader.slice(7), process.env.JWT_SECRET!) as { userId: string }
+    await prisma.user.delete({ where: { id: payload.userId } })
+    res.json({ ok: true })
+  } catch {
+    res.status(401).json({ error: 'Ungültiger Token' })
+  }
+})
+
 // POST /api/auth/forgot-password
 authRouter.post('/forgot-password', async (req: Request, res: Response) => {
   const { email } = req.body

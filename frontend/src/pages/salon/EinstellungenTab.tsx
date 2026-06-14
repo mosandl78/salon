@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Save, Clock } from 'lucide-react'
+import { Save, Clock, Store } from 'lucide-react'
 import api from '../../api'
-import type { Salon } from '../../types'
+import type { Salon, Country, BusinessType } from '../../types'
 
 const DAYS = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag']
 const HOUR_OPTIONS = [0, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11, 12]
@@ -33,7 +33,14 @@ export default function EinstellungenTab({ salonId, salon }: { salonId: string; 
     }
   }, [ohData])
 
-  // Salon-Einstellungen
+  // Salon-Stammdaten
+  const [salonName, setSalonName]     = useState(salon.name)
+  const [country, setCountry]         = useState<Country>(salon.country)
+  const [businessType, setBusiness]   = useState<BusinessType>(salon.businessType)
+  const [planStart, setPlanStart]     = useState(salon.planStart?.slice(0, 10) ?? '')
+  const [planEnd, setPlanEnd]         = useState(salon.planEnd?.slice(0, 10) ?? '')
+
+  // Betriebseinstellungen
   const [fullTimeHours, setFullTime] = useState(salon.fullTimeHours.toString())
   const [vacationWeeks, setVacation] = useState(salon.vacationWeeks.toString())
 
@@ -56,7 +63,7 @@ export default function EinstellungenTab({ salonId, salon }: { salonId: string; 
   async function handleSave() {
     await Promise.all([
       ohMutation.mutateAsync(hours),
-      salonMutation.mutateAsync({ fullTimeHours, vacationWeeks }),
+      salonMutation.mutateAsync({ name: salonName, country, businessType, planStart, planEnd, fullTimeHours, vacationWeeks }),
     ])
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
@@ -74,6 +81,52 @@ export default function EinstellungenTab({ salonId, salon }: { salonId: string; 
 
   return (
     <div className="space-y-6">
+      {/* Salon-Stammdaten */}
+      <div className="bg-white border border-gray-200 rounded-2xl p-6">
+        <h2 className="text-sm font-semibold text-gray-900 mb-5 flex items-center gap-2">
+          <Store className="w-4 h-4 text-gray-400" /> Salon-Daten
+        </h2>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-xs font-medium text-gray-700 mb-1">Salonname</label>
+            <input value={salonName} onChange={e => setSalonName(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900" />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">Land</label>
+              <select value={country} onChange={e => setCountry(e.target.value as Country)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900">
+                <option value="DE">Deutschland</option>
+                <option value="AT">Österreich</option>
+                <option value="CH">Schweiz</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">Betriebsform</label>
+              <select value={businessType} onChange={e => setBusiness(e.target.value as BusinessType)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900">
+                <option value="SOLO">Solo / Einzelunternehmen</option>
+                <option value="GBR">GbR</option>
+                <option value="GMBH">GmbH / UG</option>
+              </select>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">Planungsbeginn</label>
+              <input type="date" value={planStart} onChange={e => setPlanStart(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900" />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">Planungsende</label>
+              <input type="date" value={planEnd} onChange={e => setPlanEnd(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900" />
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Öffnungszeiten */}
       <div className="bg-white border border-gray-200 rounded-2xl p-6">
         <h2 className="text-sm font-semibold text-gray-900 mb-1 flex items-center gap-2">
