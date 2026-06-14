@@ -11,6 +11,7 @@ import DatenschutzPage      from './pages/DatenschutzPage'
 import ForgotPasswordPage   from './pages/ForgotPasswordPage'
 import ResetPasswordPage    from './pages/ResetPasswordPage'
 import AccountPage          from './pages/AccountPage'
+import KontaktPage          from './pages/KontaktPage'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const token = localStorage.getItem('salon_token')
@@ -32,7 +33,8 @@ export default function App() {
       <Route path="/datenschutz"      element={<DatenschutzPage />} />
       <Route path="/forgot-password"  element={<ForgotPasswordPage />} />
       <Route path="/reset-password"   element={<ResetPasswordPage />} />
-      <Route path="/account"          element={<ProtectedRoute><AccountPage /></ProtectedRoute>} />
+      <Route path="/account"           element={<ProtectedRoute><AccountPage /></ProtectedRoute>} />
+      <Route path="/kontakt"           element={<KontaktPage />} />
     </Routes>
   )
 }

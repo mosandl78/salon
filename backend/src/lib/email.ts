@@ -31,6 +31,30 @@ export async function sendWelcomeMail(to: string, name: string) {
   })
 }
 
+export async function sendContactMail(fromName: string, fromEmail: string, subject: string, message: string) {
+  const CONTACT_TO = process.env.CONTACT_EMAIL ?? 'peter@vemix.net'
+  await resend.emails.send({
+    from: `SALON Kontakt <${FROM}>`,
+    to: CONTACT_TO,
+    reply_to: fromEmail,
+    subject: `[SALON Kontakt] ${subject}`,
+    html: `
+      <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;color:#111">
+        <h1 style="font-size:20px;margin-bottom:4px">Neue Kontaktanfrage</h1>
+        <p style="color:#999;font-size:13px;margin-bottom:24px">über salon.vemix.net/kontakt</p>
+        <table style="width:100%;border-collapse:collapse;font-size:14px;margin-bottom:24px">
+          <tr><td style="padding:8px 0;color:#666;width:100px">Name</td><td style="padding:8px 0;font-weight:600">${fromName}</td></tr>
+          <tr><td style="padding:8px 0;color:#666">E-Mail</td><td style="padding:8px 0"><a href="mailto:${fromEmail}" style="color:#111">${fromEmail}</a></td></tr>
+          <tr><td style="padding:8px 0;color:#666">Betreff</td><td style="padding:8px 0">${subject}</td></tr>
+        </table>
+        <div style="background:#f9f9f9;border-radius:8px;padding:16px 20px;font-size:14px;line-height:1.7;color:#333;white-space:pre-wrap">${message}</div>
+        <hr style="margin:32px 0;border:none;border-top:1px solid #eee" />
+        <p style="font-size:12px;color:#999">SALON · by Peter Lehmann</p>
+      </div>
+    `,
+  })
+}
+
 export async function sendPasswordResetMail(to: string, name: string, token: string) {
   const link = `${APP_URL}/reset-password?token=${token}`
   await resend.emails.send({

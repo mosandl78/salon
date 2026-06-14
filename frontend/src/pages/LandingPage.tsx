@@ -228,6 +228,7 @@ export default function LandingPage() {
             <span style={{ fontFamily: "'Kaushan Script', cursive" }}>by Peter Lehmann</span>
           </div>
           <div className="flex items-center gap-4">
+            <a href="/kontakt"     className="hover:text-gray-700 transition-colors">Kontakt</a>
             <a href="/impressum"   className="hover:text-gray-700 transition-colors">Impressum</a>
             <a href="/datenschutz" className="hover:text-gray-700 transition-colors">Datenschutz</a>
             <span>© {new Date().getFullYear()}</span>

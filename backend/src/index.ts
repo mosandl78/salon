@@ -13,6 +13,7 @@ import { openingHoursRouter } from './routes/opening-hours'
 import { calculationRouter }  from './routes/calculation'
 import { adminRouter }        from './routes/admin'
 import { demoRouter }         from './routes/demo'
+import { contactRouter }      from './routes/contact'
 import { requireNotDemo }     from './middleware/demo'
 
 const app  = express()
@@ -37,8 +38,9 @@ app.use('/api/salons', servicesRouter)
 app.use('/api/salons', actualsRouter)
 app.use('/api/salons', openingHoursRouter)
 app.use('/api/salons', calculationRouter)
-app.use('/api/admin',  adminRouter)
-app.use('/api/demo',   demoRouter)
+app.use('/api/admin',   adminRouter)
+app.use('/api/demo',    demoRouter)
+app.use('/api/contact', contactRouter)
 
 app.get('/api/health', (_, res) => res.json({ ok: true, service: 'salon-api' }))
 
