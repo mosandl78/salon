@@ -89,7 +89,7 @@ export default function DemoPage() {
       </div>
 
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 px-6 py-4">
+      <header className="bg-white border-b border-gray-200 px-4 sm:px-6 py-4">
         <div className="max-w-5xl mx-auto flex items-center gap-4">
           <button onClick={() => navigate('/start')} className="text-gray-400 hover:text-gray-700">
             <ArrowLeft className="w-5 h-5" />
@@ -104,8 +104,20 @@ export default function DemoPage() {
 
       {/* Tabs */}
       <div className="bg-white border-b border-gray-200">
-        <div className="max-w-5xl mx-auto px-6">
-          <nav className="flex gap-0 overflow-x-auto">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          {/* Mobile: Select-Dropdown */}
+          <div className="sm:hidden py-2">
+            <select
+              value={tab}
+              onChange={e => setTab(e.target.value)}
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-gray-900">
+              {TABS.map(t => (
+                <option key={t.id} value={t.id}>{t.label}</option>
+              ))}
+            </select>
+          </div>
+          {/* Desktop: Tab-Leiste */}
+          <nav className="hidden sm:flex gap-0 overflow-x-auto">
             {TABS.map(t => (
               <button key={t.id} onClick={() => setTab(t.id)}
                 className={`px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
@@ -121,7 +133,7 @@ export default function DemoPage() {
       </div>
 
       {/* Content */}
-      <div className="max-w-5xl mx-auto px-6 py-8">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
         {tab === 'uebersicht' && (
           <SetupGuide salon={salon} salonId={salonId} onNavigate={setTab} />
         )}
@@ -138,12 +150,13 @@ export default function DemoPage() {
       </div>
 
       {/* Sticky CTA */}
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
-        <div className="bg-gray-900 text-white px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-4 text-sm">
-          <span className="text-gray-300">Gefällt dir was du siehst?</span>
+      <div className="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] sm:w-auto">
+        <div className="bg-gray-900 text-white px-4 sm:px-6 py-3 rounded-2xl shadow-2xl flex items-center justify-between sm:justify-start gap-3 sm:gap-4 text-sm">
+          <span className="text-gray-300 hidden sm:inline">Gefällt dir was du siehst?</span>
           <button onClick={() => navigate('/register')}
-            className="bg-white text-gray-900 font-semibold px-4 py-1.5 rounded-lg hover:bg-gray-100 whitespace-nowrap">
-            Neuen Salon eröffnen — 129 € / Jahr →
+            className="bg-white text-gray-900 font-semibold px-4 py-1.5 rounded-lg hover:bg-gray-100 whitespace-nowrap flex-1 sm:flex-none text-center">
+            <span className="hidden sm:inline">Neuen Salon eröffnen — 129 € / Jahr →</span>
+            <span className="sm:hidden">Salon eröffnen — 129 € / Jahr →</span>
           </button>
         </div>
       </div>
