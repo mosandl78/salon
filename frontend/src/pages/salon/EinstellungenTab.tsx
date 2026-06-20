@@ -92,7 +92,7 @@ export default function EinstellungenTab({ salonId, salon, readOnly }: { salonId
             <input value={salonName} onChange={e => setSalonName(e.target.value)} disabled={readOnly}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 disabled:bg-gray-50 disabled:text-gray-500" />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-1">Land</label>
               <select value={country} onChange={e => setCountry(e.target.value as Country)} disabled={readOnly}
@@ -112,7 +112,7 @@ export default function EinstellungenTab({ salonId, salon, readOnly }: { salonId
               </select>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-1">Planungsbeginn</label>
               <input type="date" value={planStart} onChange={e => setPlanStart(e.target.value)} disabled={readOnly}
@@ -139,9 +139,21 @@ export default function EinstellungenTab({ salonId, salon, readOnly }: { salonId
             const entry = hours.find(h => h.weekday === i)
             const val   = entry?.openHours ?? 0
             return (
-              <div key={i} className="flex items-center gap-4">
-                <span className="text-sm text-gray-700 w-24 shrink-0">{day}</span>
-                <div className="flex gap-2 flex-wrap">
+              <div key={i} className="flex items-center gap-3">
+                <span className="text-sm text-gray-700 w-20 sm:w-24 shrink-0">{day}</span>
+                {/* Mobile: Select */}
+                <select
+                  value={val}
+                  onChange={e => !readOnly && setDayHours(i, parseFloat(e.target.value))}
+                  disabled={readOnly}
+                  className="sm:hidden flex-1 border border-gray-200 rounded-lg px-2 py-1.5 text-sm text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-gray-900 disabled:bg-gray-50 disabled:text-gray-400">
+                  <option value={0}>Ruhetag</option>
+                  {HOUR_OPTIONS.filter(h => h > 0).map(h => (
+                    <option key={h} value={h}>{h}h</option>
+                  ))}
+                </select>
+                {/* Desktop: Button-Reihe */}
+                <div className="hidden sm:flex gap-2 flex-wrap">
                   <button
                     onClick={() => !readOnly && setDayHours(i, 0)}
                     className={`px-3 py-1 text-xs rounded-lg border font-medium transition-colors ${
@@ -183,7 +195,7 @@ export default function EinstellungenTab({ salonId, salon, readOnly }: { salonId
       {/* Betriebseinstellungen */}
       <div className="bg-white border border-gray-200 rounded-2xl p-6">
         <h2 className="text-sm font-semibold text-gray-900 mb-5">Betriebseinstellungen</h2>
-        <div className="grid grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <div>
             <label className="block text-xs font-medium text-gray-700 mb-1">
               Vollzeit-Stunden / Woche (Tarif)

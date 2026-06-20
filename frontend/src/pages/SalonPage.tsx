@@ -69,7 +69,19 @@ export default function SalonPage() {
 
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
-          <nav className="flex gap-0 overflow-x-auto">
+          {/* Mobile: Select-Dropdown */}
+          <div className="sm:hidden py-2">
+            <select
+              value={tab}
+              onChange={e => setTab(e.target.value)}
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-gray-900">
+              {TABS.map(t => (
+                <option key={t.id} value={t.id}>{t.label}</option>
+              ))}
+            </select>
+          </div>
+          {/* Desktop: Tab-Leiste */}
+          <nav className="hidden sm:flex gap-0 overflow-x-auto">
             {TABS.map(t => (
               <button key={t.id} onClick={() => setTab(t.id)}
                 className={`px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${

@@ -88,25 +88,26 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Nav */}
-      <header className="border-b border-gray-100 px-6 py-4">
+      <header className="border-b border-gray-100 px-4 sm:px-6 py-4">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Scissors className="w-5 h-5 text-gray-800" />
-            <span className="text-lg font-bold text-gray-900">SALON</span>
-            <span className="text-base accent-text" style={{ fontFamily: "'Kaushan Script', cursive" }}>by Peter Lehmann</span>
+          <div className="flex items-center gap-2 min-w-0">
+            <Scissors className="w-5 h-5 text-gray-800 shrink-0" />
+            <span className="text-lg font-bold text-gray-900 shrink-0">SALON</span>
+            <span className="hidden sm:inline text-base accent-text truncate" style={{ fontFamily: "'Kaushan Script', cursive" }}>by Peter Lehmann</span>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <button onClick={() => navigate('/demo')}
-              className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-gray-900">
+              className="hidden sm:flex items-center gap-1.5 text-sm text-gray-600 hover:text-gray-900">
               <Play className="w-3.5 h-3.5" /> Demo ansehen
             </button>
             <button onClick={() => setShowLogin(true)}
-              className="text-sm text-gray-600 hover:text-gray-900 border border-gray-200 rounded-lg px-4 py-2 hover:border-gray-400 transition-colors">
+              className="text-sm text-gray-600 hover:text-gray-900 border border-gray-200 rounded-lg px-3 sm:px-4 py-2 hover:border-gray-400 transition-colors">
               Login
             </button>
             <button onClick={() => navigate('/register')}
-              className="text-sm bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800">
-              Neuen Salon eröffnen
+              className="text-sm bg-gray-900 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-gray-800 whitespace-nowrap">
+              <span className="hidden sm:inline">Neuen Salon eröffnen</span>
+              <span className="sm:hidden">Registrieren</span>
             </button>
           </div>
         </div>
