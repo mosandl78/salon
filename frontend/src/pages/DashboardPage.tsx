@@ -40,32 +40,32 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 px-6 py-4">
+      <header className="bg-white border-b border-gray-200 px-4 sm:px-6 py-4">
         <div className="max-w-3xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Scissors className="w-5 h-5 text-gray-800" />
             <span className="text-lg font-bold text-gray-900">SALON</span>
-            <span className="text-base accent-text" style={{ fontFamily: "'Kaushan Script', cursive" }}>by Peter Lehmann</span>
+            <span className="hidden sm:inline text-base accent-text" style={{ fontFamily: "'Kaushan Script', cursive" }}>by Peter Lehmann</span>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             {currentUser?.isAdmin && (
               <button onClick={() => navigate('/admin')}
-                className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 border border-gray-200 rounded-lg px-3 py-1.5 hover:border-gray-400 transition-colors">
-                <Shield className="w-4 h-4" /> Admin
+                className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 border border-gray-200 rounded-lg px-2.5 sm:px-3 py-1.5 hover:border-gray-400 transition-colors">
+                <Shield className="w-4 h-4" /><span className="hidden sm:inline"> Admin</span>
               </button>
             )}
             <button onClick={() => navigate('/account')}
-              className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 border border-gray-200 rounded-lg px-3 py-1.5 hover:border-gray-400 transition-colors">
-              <UserCircle className="w-4 h-4" /> Konto
+              className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 border border-gray-200 rounded-lg px-2.5 sm:px-3 py-1.5 hover:border-gray-400 transition-colors">
+              <UserCircle className="w-4 h-4" /><span className="hidden sm:inline"> Konto</span>
             </button>
             <button onClick={handleLogout} className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900">
-              <LogOut className="w-4 h-4" /> Abmelden
+              <LogOut className="w-4 h-4" /><span className="hidden sm:inline"> Abmelden</span>
             </button>
           </div>
         </div>
       </header>
 
-      <main className="max-w-3xl mx-auto px-6 py-8">
+      <main className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-xl font-bold text-gray-900">Meine Salons</h1>

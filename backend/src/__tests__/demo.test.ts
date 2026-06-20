@@ -1,4 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
+
+vi.mock('../lib/prisma', async () => await import('../lib/__mocks__/prisma'))
+
 import request from 'supertest'
 import app from './app'
 import { prisma } from '../lib/prisma'

@@ -1,11 +1,27 @@
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-const FROM = process.env.EMAIL_FROM ?? 'noreply@vemix.net'
+const FROM    = process.env.EMAIL_FROM   ?? 'noreply@vemix.net'
 const APP_URL = process.env.FRONTEND_URL ?? 'http://localhost:5174'
 
+/** Lazy singleton — wird nur instanziiert wenn ein API-Key vorhanden ist. */
+function getResend(): Resend | null {
+  const key = process.env.RESEND_API_KEY
+  if (!key) return null
+  return new Resend(key)
+}
+
+async function send(payload: Parameters<Resend['emails']['send']>[0]): Promise<void> {
+  const resend = getResend()
+  if (!resend) {
+    // Kein API-Key → E-Mail nur loggen (Dev / Test)
+    console.warn('[email] RESEND_API_KEY not set — skipping send:', payload.subject)
+    return
+  }
+  await resend.emails.send(payload)
+}
+
 export async function sendWelcomeMail(to: string, name: string) {
-  await resend.emails.send({
+  await send({
     from: `SALON <${FROM}>`,
     to,
     subject: 'Willkommen bei SALON 💇',
@@ -33,7 +49,7 @@ export async function sendWelcomeMail(to: string, name: string) {
 
 export async function sendContactMail(fromName: string, fromEmail: string, subject: string, message: string) {
   const CONTACT_TO = process.env.CONTACT_EMAIL ?? 'mosandl@vemix.net'
-  await resend.emails.send({
+  await send({
     from: `SALON Kontakt <${FROM}>`,
     to: CONTACT_TO,
     replyTo: fromEmail,
@@ -57,7 +73,7 @@ export async function sendContactMail(fromName: string, fromEmail: string, subje
 
 export async function sendPasswordResetMail(to: string, name: string, token: string) {
   const link = `${APP_URL}/reset-password?token=${token}`
-  await resend.emails.send({
+  await send({
     from: `SALON <${FROM}>`,
     to,
     subject: 'Passwort zurücksetzen',

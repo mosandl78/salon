@@ -75,16 +75,16 @@ export default function DemoPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Demo-Banner */}
-      <div className="bg-gray-900 text-white px-6 py-2.5 flex items-center justify-between">
-        <div className="flex items-center gap-2 text-sm">
-          <Play className="w-3.5 h-3.5 text-green-400" />
-          <span className="text-gray-300">Demo-Ansicht</span>
-          <span className="text-gray-500">·</span>
-          <span className="text-gray-300">{salon.name} — alle Daten sind Beispieldaten</span>
+      <div className="bg-gray-900 text-white px-4 sm:px-6 py-2.5 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2 text-sm min-w-0">
+          <Play className="w-3.5 h-3.5 text-green-400 shrink-0" />
+          <span className="text-gray-300 shrink-0">Demo</span>
+          <span className="text-gray-500 hidden sm:inline">·</span>
+          <span className="text-gray-300 truncate hidden sm:inline">{salon.name} — alle Daten sind Beispieldaten</span>
         </div>
         <button onClick={() => navigate('/register')}
-          className="bg-white text-gray-900 text-xs font-semibold px-4 py-1.5 rounded-lg hover:bg-gray-100">
-          Neuen Salon eröffnen →
+          className="bg-white text-gray-900 text-xs font-semibold px-3 sm:px-4 py-1.5 rounded-lg hover:bg-gray-100 shrink-0">
+          Salon eröffnen →
         </button>
       </div>
 

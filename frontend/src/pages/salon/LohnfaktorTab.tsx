@@ -77,7 +77,7 @@ export default function LohnfaktorTab({ salonId, salon }: { salonId: string; sal
         <div className="flex items-start justify-between">
           <div>
             <p className="text-sm text-gray-500 font-medium">Lohnfaktor (Grundlohn)</p>
-            <p className={`text-5xl font-bold mt-1 ${lohnfaktorColor(calc.lohnfaktor)}`}>
+            <p className={`text-3xl sm:text-5xl font-bold mt-1 ${lohnfaktorColor(calc.lohnfaktor)}`}>
               {calc.lohnfaktor.toFixed(2)}
             </p>
             <p className="text-sm text-gray-400 mt-2">

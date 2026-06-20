@@ -29,7 +29,7 @@ export default function AdminPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200 px-6 py-4">
+      <header className="bg-white border-b border-gray-200 px-4 sm:px-6 py-4">
         <div className="max-w-5xl mx-auto flex items-center gap-4">
           <button onClick={() => navigate('/')} className="text-gray-400 hover:text-gray-700">
             <ArrowLeft className="w-5 h-5" />
@@ -106,7 +106,7 @@ function AdminDashboard() {
       {/* Plan-Verteilung */}
       <div className="bg-white border border-gray-200 rounded-2xl p-6">
         <h2 className="text-sm font-semibold text-gray-900 mb-5">Plan-Verteilung</h2>
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {plans.map(plan => {
             const count = stats.planCounts[plan] ?? 0
             const pct   = stats.totalUsers > 0 ? (count / stats.totalUsers) * 100 : 0
@@ -279,7 +279,7 @@ function EditUserModal({ user, onClose, onSaved }: { user: AdminUser; onClose: (
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Toggles */}
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <label className="flex items-start gap-2 cursor-pointer p-3 rounded-xl border border-gray-200 hover:border-gray-300">
               <input type="checkbox" checked={isAdmin} onChange={e => setIsAdmin(e.target.checked)}
                 className="mt-0.5 rounded border-gray-300 text-gray-900 focus:ring-gray-900" />

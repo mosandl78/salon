@@ -162,7 +162,7 @@ export default function LandingPage() {
             <div className="bg-gray-900 text-white rounded-3xl p-8 shadow-xl">
               <p className="text-sm text-gray-400 font-medium mb-2">SALON Pro</p>
               <div className="flex items-end gap-1 mb-1">
-                <span className="text-5xl font-bold">129</span>
+                <span className="text-3xl sm:text-5xl font-bold">129</span>
                 <span className="text-xl font-medium text-gray-300 pb-1">€</span>
               </div>
               <p className="text-sm text-gray-400 mb-8">pro Jahr · netto zzgl. MwSt.</p>

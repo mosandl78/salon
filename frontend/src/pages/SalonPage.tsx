@@ -54,7 +54,7 @@ export default function SalonPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200 px-6 py-4">
+      <header className="bg-white border-b border-gray-200 px-4 sm:px-6 py-4">
         <div className="max-w-5xl mx-auto flex items-center gap-4">
           <button onClick={() => navigate('/')} className="text-gray-400 hover:text-gray-700">
             <ArrowLeft className="w-5 h-5" />
@@ -68,7 +68,7 @@ export default function SalonPage() {
       </header>
 
       <div className="bg-white border-b border-gray-200">
-        <div className="max-w-5xl mx-auto px-6">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <nav className="flex gap-0 overflow-x-auto">
             {TABS.map(t => (
               <button key={t.id} onClick={() => setTab(t.id)}
@@ -84,7 +84,7 @@ export default function SalonPage() {
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-6 py-8">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
         {tab === 'uebersicht' && (
           <SetupGuide salon={salon} salonId={id!} onNavigate={setTab} />
         )}

@@ -164,7 +164,7 @@ export default function EinstellungenTab({ salonId, salon, readOnly }: { salonId
         </div>
 
         {/* Vorschau */}
-        <div className="mt-5 grid grid-cols-3 gap-3 p-4 bg-gray-50 rounded-xl text-xs text-gray-600">
+        <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 bg-gray-50 rounded-xl text-xs text-gray-600">
           <div>
             <p className="text-gray-400">Arbeitstage / Woche</p>
             <p className="font-semibold text-gray-900 text-base">{workDaysPerWeek}</p>

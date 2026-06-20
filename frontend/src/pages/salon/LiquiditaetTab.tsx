@@ -71,7 +71,7 @@ export default function LiquiditaetTab({ salonId, salon }: { salonId: string; sa
   return (
     <div className="space-y-6">
       {/* Header KPIs */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
           ['Gesamtkosten / Jahr', `${fmt(jahresGesamt)} €`],
           ['Ø Kosten / Monat', `${fmt(jahresGesamt / 12)} €`],
