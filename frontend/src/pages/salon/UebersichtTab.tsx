@@ -80,11 +80,35 @@ export default function UebersichtTab({ salonId }: { salonId: string; salon: Sal
   return (
     <div className="space-y-6">
       {/* KPIs */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <KPI label="Mindestumsatz / Jahr" value={`${fmt(calc.mindestumsatzNet)} €`} sub="Netto" />
-        <KPI label="Lohnfaktor" value={calc.lohnfaktor.toFixed(2)} sub="Gesamtkosten ÷ Bruttolohn" />
-        <KPI label="Personalkosten" value={`${fmt(calc.totalPersonalkosten)} €`} sub={`inkl. ${(calc.employerRate * 100).toFixed(1)} % AG-Anteil`} />
-        <KPI label="Gemeinkosten" value={`${fmt(calc.totalGemeinkosten)} €`} sub="fix / Jahr" />
+      {/* KPI-Formel: Mindestumsatz = Personalkosten + Fixkosten + Wareneinsatz */}
+      <div className="flex items-center gap-1 flex-wrap">
+        {/* Mindestumsatz */}
+        <div className="bg-gray-900 text-white rounded-2xl p-5 flex-1 min-w-[140px]">
+          <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Mindestumsatz / Jahr</p>
+          <p className="text-2xl font-bold mt-1">{fmt(calc.mindestumsatzNet)} €</p>
+          <p className="text-xs text-gray-500 mt-0.5">netto</p>
+        </div>
+        <span className="text-xl font-bold text-gray-400 px-1">=</span>
+        {/* Personalkosten */}
+        <div className="bg-white border border-gray-200 rounded-2xl p-5 flex-1 min-w-[140px]">
+          <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Personalkosten / Jahr</p>
+          <p className="text-2xl font-bold text-gray-900 mt-1">{fmt(calc.totalPersonalkosten)} €</p>
+          <p className="text-xs text-gray-400 mt-0.5">inkl. {(calc.employerRate * 100).toFixed(1)} % AG-Anteil</p>
+        </div>
+        <span className="text-xl font-bold text-gray-400 px-1">+</span>
+        {/* Fixkosten */}
+        <div className="bg-white border border-gray-200 rounded-2xl p-5 flex-1 min-w-[140px]">
+          <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Fixkosten / Jahr</p>
+          <p className="text-2xl font-bold text-gray-900 mt-1">{fmt(calc.totalGemeinkosten + calc.unternehmerlohn)} €</p>
+          <p className="text-xs text-gray-400 mt-0.5">GK + Unternehmerlohn</p>
+        </div>
+        <span className="text-xl font-bold text-gray-400 px-1">+</span>
+        {/* Wareneinsatz */}
+        <div className="bg-white border border-gray-200 rounded-2xl p-5 flex-1 min-w-[140px]">
+          <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Wareneinsatz / Jahr</p>
+          <p className="text-2xl font-bold text-gray-900 mt-1">{fmt(Math.round(calc.mindestumsatzNet * calc.wareneinsatzRate))} €</p>
+          <p className="text-xs text-gray-400 mt-0.5">{(calc.wareneinsatzRate * 100).toFixed(0)} % vom Mindestumsatz</p>
+        </div>
       </div>
 
       {/* Jahresverlauf-Diagramm */}
@@ -109,23 +133,30 @@ export default function UebersichtTab({ salonId }: { salonId: string; salon: Sal
         <h2 className="text-sm font-semibold text-gray-900 mb-4">Kostenstruktur</h2>
         <div className="space-y-3">
           {[
-            { label: 'Personalkosten', value: calc.totalPersonalkosten, color: 'bg-gray-800' },
-            { label: 'Gemeinkosten',   value: calc.totalGemeinkosten,   color: 'bg-gray-500' },
-            { label: 'Unternehmerlohn', value: calc.unternehmerlohn,    color: 'bg-gray-300' },
+            { label: 'Personalkosten',  value: calc.totalPersonalkosten,                              color: 'bg-gray-800', sub: `inkl. ${(calc.employerRate * 100).toFixed(1)} % AG-Anteil` },
+            { label: 'Gemeinkosten',    value: calc.totalGemeinkosten,                                color: 'bg-gray-500', sub: 'Miete, Strom, Versicherung …' },
+            { label: 'Unternehmerlohn', value: calc.unternehmerlohn,                                  color: 'bg-gray-300', sub: 'Lohn des Inhabers' },
+            { label: `Wareneinsatz (${(calc.wareneinsatzRate * 100).toFixed(0)} % vom Umsatz)`,
+                                        value: calc.mindestumsatzNet * calc.wareneinsatzRate,          color: 'bg-amber-300', sub: 'Produkte & Material' },
           ].map(item => {
             const pct = calc.mindestumsatzNet > 0 ? (item.value / calc.mindestumsatzNet) * 100 : 0
             return (
               <div key={item.label}>
-                <div className="flex justify-between text-xs text-gray-600 mb-1">
+                <div className="flex justify-between text-xs text-gray-600 mb-0.5">
                   <span>{item.label}</span>
                   <span className="font-medium">{fmt(item.value)} € · {pct.toFixed(1)} %</span>
                 </div>
+                {item.sub && <p className="text-xs text-gray-400 mb-1">{item.sub}</p>}
                 <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                   <div className={`h-full ${item.color} rounded-full`} style={{ width: `${pct}%` }} />
                 </div>
               </div>
             )
           })}
+          <div className="flex justify-between text-sm font-semibold text-gray-900 pt-2 border-t border-gray-100">
+            <span>= Mindestumsatz / Jahr (netto)</span>
+            <span>{fmt(calc.mindestumsatzNet)} €</span>
+          </div>
         </div>
       </div>
 

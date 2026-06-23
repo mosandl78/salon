@@ -167,6 +167,11 @@ function EmployeeModal({ salonId, initial, fullTimeHours, onClose, onSaved }:
                   <option key={r} value={r}>{ROLE_LABEL[r]}</option>
                 ))}
               </select>
+              {role === 'CHEF' && (
+                <p className="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mt-2">
+                  💡 Tipp: Wenn der Inhaber zusätzlich ein Unternehmerlohn-Entnahme erhält, kann diese separat unter <strong>Kosten → Unternehmerlohn</strong> erfasst werden.
+                </p>
+              )}
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">

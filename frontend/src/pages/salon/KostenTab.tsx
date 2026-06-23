@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Plus, Pencil, Trash2, Receipt } from 'lucide-react'
 import api from '../../api'
-import type { Salon, CostItem, CostCategory } from '../../types'
+import type { Salon, CostItem, CostCategory, CalculationResult } from '../../types'
 
 const CATEGORY_GROUPS: { label: string; categories: CostCategory[] }[] = [
   { label: 'Raumkosten',      categories: ['MIETE', 'NEBENKOSTEN', 'STROM', 'WASSER'] },
@@ -29,6 +29,11 @@ export default function KostenTab({ salonId, salon, readOnly = false }: { salonI
   const qc = useQueryClient()
   const [editing, setEditing]   = useState<CostItem | null>(null)
   const [showForm, setShowForm] = useState(false)
+
+  const { data: calc } = useQuery<CalculationResult>({
+    queryKey: ['calc', salonId],
+    queryFn: () => api.get(`/salons/${salonId}/calculation`).then(r => r.data),
+  })
 
   const { data: costs = [] } = useQuery<CostItem[]>({
     queryKey: ['costs', salonId],
@@ -97,11 +102,13 @@ export default function KostenTab({ salonId, salon, readOnly = false }: { salonI
                       </td>
                       <td className="px-5 py-3 text-right text-gray-700">
                         {cost.category === 'WARENEINSATZ'
-                          ? `${(annual(cost.amounts) * 100).toFixed(0)} %`
+                          ? `${((cost.amounts[0] ?? 0) * 100).toFixed(0)} %`
                           : `${fmt(annual(cost.amounts) / 12)} €`}
                       </td>
                       <td className="px-5 py-3 text-right text-gray-500">
-                        {cost.category === 'WARENEINSATZ' ? '—' : `${fmt(annual(cost.amounts))} €`}
+                        {cost.category === 'WARENEINSATZ'
+                          ? calc ? `${fmt(Math.round(calc.mindestumsatzNet * calc.wareneinsatzRate))} €` : '—'
+                          : `${fmt(annual(cost.amounts))} €`}
                       </td>
                       {!readOnly && (
                         <td className="px-5 py-3 text-right">
@@ -183,6 +190,11 @@ function CostModal({ salonId, initial, onClose, onSaved }:
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900">
               {allCategories.map(c => <option key={c} value={c}>{CATEGORY_LABEL[c]}</option>)}
             </select>
+            {category === 'UNTERNEHMERLOHN' && (
+              <p className="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mt-2">
+                💡 Tipp: Wenn der Inhaber auch aktiv im Salon arbeitet, kann er zusätzlich unter <strong>Mitarbeiter → Inhaber/in</strong> erfasst werden — damit fließt er in den Lohnfaktor ein.
+              </p>
+            )}
           </div>
           <div>
             <label className="block text-xs font-medium text-gray-700 mb-1">Bezeichnung</label>
