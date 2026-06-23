@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
-import { Plus, Scissors, LogOut, ChevronRight, Shield, UserCircle, Trash2 } from 'lucide-react'
+import { Plus, Scissors, LogOut, ChevronRight, Shield, UserCircle, Trash2, Copy } from 'lucide-react'
 import api from '../api'
 import type { Salon, Country, BusinessType } from '../types'
 import { useCurrentUser } from '../hooks/useCurrentUser'
@@ -17,6 +17,7 @@ export default function DashboardPage() {
   const queryClient  = useQueryClient()
   const [showNew, setShowNew] = useState(false)
   const [deleteId, setDeleteId] = useState<string | null>(null)
+  const [duplicateId, setDuplicateId] = useState<string | null>(null)
   const { data: currentUser } = useCurrentUser()
 
   const deleteMutation = useMutation({
@@ -95,8 +96,12 @@ export default function DashboardPage() {
                     {COUNTRY_LABEL[salon.country]} · {fmt(salon.planStart)} – {fmt(salon.planEnd)}
                   </p>
                 </button>
-                <div className="flex items-center gap-2">
-                  <button onClick={() => setDeleteId(salon.id)}
+                <div className="flex items-center gap-1">
+                  <button onClick={e => { e.stopPropagation(); setDuplicateId(salon.id) }}
+                    className="p-2 text-gray-300 hover:text-gray-700 transition-colors" title="Salon duplizieren">
+                    <Copy className="w-4 h-4" />
+                  </button>
+                  <button onClick={e => { e.stopPropagation(); setDeleteId(salon.id) }}
                     className="p-2 text-gray-300 hover:text-red-500 transition-colors">
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -107,6 +112,18 @@ export default function DashboardPage() {
           </div>
         )}
       </main>
+
+      {duplicateId && (
+        <DuplicateSalonModal
+          salonId={duplicateId}
+          salonName={salons.find(s => s.id === duplicateId)?.name ?? ''}
+          onClose={() => setDuplicateId(null)}
+          onCreated={() => {
+            queryClient.invalidateQueries({ queryKey: ['salons'] })
+            setDuplicateId(null)
+          }}
+        />
+      )}
 
       {showNew && <NewSalonModal onClose={() => setShowNew(false)} onCreated={() => {
         queryClient.invalidateQueries({ queryKey: ['salons'] })
@@ -137,12 +154,23 @@ export default function DashboardPage() {
   )
 }
 
+function currentYearDates() {
+  const y = new Date().getFullYear()
+  return { start: `${y}-01-01`, end: `${y}-12-31` }
+}
+
+function nextYearDates() {
+  const y = new Date().getFullYear() + 1
+  return { start: `${y}-01-01`, end: `${y}-12-31` }
+}
+
 function NewSalonModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
+  const defaults = currentYearDates()
   const [name, setName]               = useState('')
   const [country, setCountry]         = useState<Country>('DE')
   const [businessType, setBusiness]   = useState<BusinessType>('SOLO')
-  const [planStart, setPlanStart]     = useState('')
-  const [planEnd, setPlanEnd]         = useState('')
+  const [planStart, setPlanStart]     = useState(defaults.start)
+  const [planEnd, setPlanEnd]         = useState(defaults.end)
   const [error, setError]             = useState('')
 
   const mutation = useMutation({
@@ -207,6 +235,68 @@ function NewSalonModal({ onClose, onCreated }: { onClose: () => void; onCreated:
             <button type="submit" disabled={mutation.isPending}
               className="flex-1 bg-gray-900 text-white rounded-lg py-2 text-sm font-medium hover:bg-gray-800 disabled:opacity-50">
               {mutation.isPending ? 'Speichern…' : 'Salon anlegen'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
+function DuplicateSalonModal({ salonId, salonName, onClose, onCreated }: {
+  salonId: string; salonName: string; onClose: () => void; onCreated: () => void
+}) {
+  const defaults = nextYearDates()
+  const [name, setName]           = useState(`${salonName} (Kopie)`)
+  const [planStart, setPlanStart] = useState(defaults.start)
+  const [planEnd, setPlanEnd]     = useState(defaults.end)
+  const [error, setError]         = useState('')
+
+  const mutation = useMutation({
+    mutationFn: (data: any) => api.post(`/salons/${salonId}/duplicate`, data),
+    onSuccess: onCreated,
+    onError: (err: any) => setError(err.response?.data?.error ?? 'Fehler beim Duplizieren'),
+  })
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    mutation.mutate({ name, planStart, planEnd })
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
+        <h2 className="text-lg font-bold text-gray-900 mb-1">Salon duplizieren</h2>
+        <p className="text-sm text-gray-500 mb-5">
+          Alle Mitarbeiter, Kosten, Öffnungszeiten und Dienstleistungen werden kopiert. IST-Umsätze werden nicht übernommen.
+        </p>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+            <input type="text" value={name} onChange={e => setName(e.target.value)} required
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900" />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Planungsbeginn</label>
+              <input type="date" value={planStart} onChange={e => setPlanStart(e.target.value)} required
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Planungsende</label>
+              <input type="date" value={planEnd} onChange={e => setPlanEnd(e.target.value)} required
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900" />
+            </div>
+          </div>
+          {error && <p className="text-sm text-red-600">{error}</p>}
+          <div className="flex gap-3 pt-2">
+            <button type="button" onClick={onClose}
+              className="flex-1 border border-gray-300 text-gray-700 rounded-lg py-2 text-sm hover:bg-gray-50">
+              Abbrechen
+            </button>
+            <button type="submit" disabled={mutation.isPending}
+              className="flex-1 bg-gray-900 text-white rounded-lg py-2 text-sm font-medium hover:bg-gray-800 disabled:opacity-50">
+              {mutation.isPending ? 'Duplizieren…' : 'Salon duplizieren'}
             </button>
           </div>
         </form>
