@@ -131,9 +131,12 @@ function estimatePrice(
   if (!calc) return null
   const pkMin = calc.pkProMinute ?? 0
   const gkMin = calc.gkProMinute ?? 0
-  const correctedUtil = Math.min(utilizationPct / 100, 1)
-  const effectiveMin = correctedUtil > 0 ? durationMinutes / correctedUtil : durationMinutes
-  const selbstkosten = effectiveMin * (pkMin + gkMin) + materialCost
+  const utilizationFactor = Math.min(utilizationPct / 100, 1) || 1
+  // Spiegelt exakt die Backend-Logik:
+  // pk-Kosten ohne Auslastungskorrektur, gk-Kosten mit Auslastungskorrektur
+  const pkKosten = pkMin * durationMinutes
+  const gkKosten = (gkMin / utilizationFactor) * durationMinutes
+  const selbstkosten = pkKosten + gkKosten + materialCost
   const nettopreis = selbstkosten * (1 + profitMarkup / 100)
   const vatRate = calc.vatRate ?? 0.19
   const bruttopreis = nettopreis * (1 + vatRate)

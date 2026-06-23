@@ -46,8 +46,9 @@ calculationRouter.get('/:salonId/calculation', authenticate, async (req: any, re
     if (item.category === 'UNTERNEHMERLOHN') {
       unternehmerlohn += annual
     } else if (item.category === 'WARENEINSATZ') {
-      // WARENEINSATZ als Anteil vom Umsatz — wird als Rate gespeichert (z.B. 0.12)
-      wareneinsatzRate = annual > 0 && annual <= 1 ? annual : annual / 100
+      // WARENEINSATZ als Anteil vom Umsatz — Rate steht in amounts[0] (z.B. 0.12 = 12%)
+      const raw = item.amounts[0] ?? 0
+      wareneinsatzRate = raw > 0 && raw <= 1 ? raw : raw / 100
     } else {
       totalGemeinkosten += annual
     }
