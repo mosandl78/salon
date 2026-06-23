@@ -49,18 +49,21 @@ export default function ControllingTab({ salonId, salon, readOnly = false }: { s
     updateActual.mutate({ employeeId, month, year: selectedYear, actual: parseFloat(value) || 0 })
   }
 
-  // Monatliche Gesamtauswertung
+  // Monatliche Gesamtauswertung — Soll nur für aktive MAs im jeweiligen Monat
   const monthlyTotals = MONTHS.map((_, i) => {
-    const soll = productive.reduce((s, e) => s + (sollMap[e.id] ?? 0), 0)
+    const soll = productive.reduce((s, e) => {
+      const isActive = e.activeMonths?.[i] === 1
+      return s + (isActive ? (sollMap[e.id] ?? 0) : 0)
+    }, 0)
     const ist  = productive.reduce((s, e) => s + getActual(e.id, i + 1), 0)
     return { name: MONTHS[i], Soll: Math.round(soll), IST: Math.round(ist), diff: Math.round(ist - soll) }
   })
 
-  // Provision je MA (Jahressumme)
+  // Provision je MA (Jahressumme) — Soll nur für aktive Monate
   const provisionData = productive.map(emp => {
     const soll        = sollMap[emp.id] ?? 0
     const istJahr     = MONTHS.reduce((s, _, i) => s + getActual(emp.id, i + 1), 0)
-    const sollJahr    = soll * 12
+    const sollJahr    = MONTHS.reduce((s, _, i) => s + (emp.activeMonths?.[i] === 1 ? soll : 0), 0)
     const mehrleistung = Math.max(0, istJahr - sollJahr)
     const provision    = Math.round(mehrleistung * PROVISION_RATE)
     return { name: emp.name, sollJahr, istJahr, mehrleistung, provision }
@@ -133,6 +136,22 @@ export default function ControllingTab({ salonId, salon, readOnly = false }: { s
                 )
               })}
             </tbody>
+            <tfoot>
+              <tr className="border-t-2 border-gray-200 bg-gray-50 font-semibold text-sm">
+                <td className="px-4 py-3 text-gray-900">Gesamt</td>
+                <td className="px-4 py-3 text-right text-gray-600">{fmt(monthlyTotals.reduce((s, r) => s + r.Soll, 0))} €</td>
+                <td className="px-4 py-3 text-right text-gray-900">{fmt(monthlyTotals.reduce((s, r) => s + r.IST, 0))} €</td>
+                {(() => {
+                  const totalDiff = monthlyTotals.reduce((s, r) => s + r.diff, 0)
+                  return (
+                    <td className={`px-4 py-3 text-right ${totalDiff >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                      {totalDiff >= 0 ? '+' : ''}{fmt(totalDiff)} €
+                    </td>
+                  )
+                })()}
+                <td className="px-4 py-3" />
+              </tr>
+            </tfoot>
           </table>
         </div>
       </div>
@@ -228,6 +247,15 @@ export default function ControllingTab({ salonId, salon, readOnly = false }: { s
               </tr>
             ))}
           </tbody>
+          <tfoot>
+            <tr className="border-t-2 border-gray-200 bg-gray-50 font-semibold text-sm">
+              <td className="px-5 py-3 text-gray-900">Gesamt</td>
+              <td className="px-5 py-3 text-right text-gray-600">{fmt(provisionData.reduce((s, p) => s + p.sollJahr, 0))} €</td>
+              <td className="px-5 py-3 text-right text-gray-900">{fmt(provisionData.reduce((s, p) => s + p.istJahr, 0))} €</td>
+              <td className="px-5 py-3 text-right text-green-600">+{fmt(provisionData.reduce((s, p) => s + p.mehrleistung, 0))} €</td>
+              <td className="px-5 py-3 text-right text-green-700 font-bold">{fmt(provisionData.reduce((s, p) => s + p.provision, 0))} €</td>
+            </tr>
+          </tfoot>
         </table>
       </div>
     </div>

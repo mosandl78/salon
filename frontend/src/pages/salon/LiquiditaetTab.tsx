@@ -53,10 +53,14 @@ export default function LiquiditaetTab({ salonId, salon }: { salonId: string; sa
       ul += cost.amounts[i] ?? 0
     }
 
-    const sollumsatz = calc.mindestumsatzNet / 12
     const gesamt     = pk + gk + ul
+    // Sollumsatz je Monat = tatsächliche Kosten des Monats / (1 - Wareneinsatzrate)
+    // So deckt der Sollumsatz exakt die monatlichen Kosten + den Wareneinsatz-Puffer
+    const wareneinsatzRate = calc.wareneinsatzRate ?? 0.12
+    const sollumsatz = wareneinsatzRate < 1 ? gesamt / (1 - wareneinsatzRate) : gesamt
+    const wareneinsatzPuffer = sollumsatz - gesamt
 
-    return { name, Personalkosten: Math.round(pk), Gemeinkosten: Math.round(gk), Unternehmerlohn: Math.round(ul), Sollumsatz: Math.round(sollumsatz), Gesamt: Math.round(gesamt) }
+    return { name, Personalkosten: Math.round(pk), Gemeinkosten: Math.round(gk), Unternehmerlohn: Math.round(ul), Gesamt: Math.round(gesamt), Sollumsatz: Math.round(sollumsatz), Wareneinsatz: Math.round(wareneinsatzPuffer) }
   })
 
   // Kumuliert
@@ -72,16 +76,21 @@ export default function LiquiditaetTab({ salonId, salon }: { salonId: string; sa
     <div className="space-y-6">
       {/* Header KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {[
-          ['Gesamtkosten / Jahr', `${fmt(jahresGesamt)} €`],
-          ['Ø Kosten / Monat', `${fmt(jahresGesamt / 12)} €`],
-          ['Sollumsatz / Monat', `${fmt(calc.mindestumsatzNet / 12)} €`],
-        ].map(([label, value]) => (
-          <div key={label} className="bg-white border border-gray-200 rounded-2xl p-5">
-            <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">{label}</p>
-            <p className="text-xl font-bold text-gray-900 mt-1">{value}</p>
-          </div>
-        ))}
+        <div className="bg-white border border-gray-200 rounded-2xl p-5">
+          <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Gesamtkosten / Jahr</p>
+          <p className="text-xl font-bold text-gray-900 mt-1">{fmt(jahresGesamt)} €</p>
+          <p className="text-xs text-gray-400 mt-1">Personalkosten + Gemeinkosten + Unternehmerlohn</p>
+        </div>
+        <div className="bg-white border border-gray-200 rounded-2xl p-5">
+          <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Ø Kosten / Monat</p>
+          <p className="text-xl font-bold text-gray-900 mt-1">{fmt(jahresGesamt / 12)} €</p>
+          <p className="text-xs text-gray-400 mt-1">Jahresdurchschnitt — Monate variieren je nach MA-Aktivität</p>
+        </div>
+        <div className="bg-white border border-gray-200 rounded-2xl p-5">
+          <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Sollumsatz / Jahr</p>
+          <p className="text-xl font-bold text-gray-900 mt-1">{fmt(monthlyData.reduce((s, m) => s + m.Sollumsatz, 0))} €</p>
+          <p className="text-xs text-gray-400 mt-1">Gesamtkosten ÷ (1 − {((calc.wareneinsatzRate ?? 0.12) * 100).toFixed(0)} % Wareneinsatz) — deckt alle Kosten inkl. Material</p>
+        </div>
       </div>
 
       {/* Flächen-Diagramm */}
@@ -121,17 +130,19 @@ export default function LiquiditaetTab({ salonId, salon }: { salonId: string; sa
             </thead>
             <tbody>
               {[
-                { key: 'Personalkosten',  label: 'Personalkosten',  bold: false },
-                { key: 'Gemeinkosten',    label: 'Gemeinkosten',    bold: false },
-                { key: 'Unternehmerlohn', label: 'Unternehmerlohn', bold: false },
-                { key: 'Gesamt',          label: 'GESAMT KOSTEN',   bold: true  },
-                { key: 'Sollumsatz',      label: 'SOLLUMSATZ',      bold: true  },
+                { key: 'Personalkosten',  label: 'Personalkosten',                                                  bold: false, sub: 'inkl. AG-Anteil' },
+                { key: 'Gemeinkosten',    label: 'Gemeinkosten',                                                    bold: false, sub: 'Miete, Strom, Versicherung …' },
+                { key: 'Unternehmerlohn', label: 'Unternehmerlohn',                                                 bold: false, sub: 'Entnahme Inhaber' },
+                { key: 'Gesamt',          label: 'FIXKOSTEN GESAMT',                                                bold: true,  sub: 'Summe der drei Positionen' },
+                { key: 'Wareneinsatz',    label: `Wareneinsatz-Puffer (${((calc.wareneinsatzRate ?? 0.12) * 100).toFixed(0)} %)`, bold: false, sub: 'Produkte & Material — % vom Sollumsatz' },
+                { key: 'Sollumsatz',      label: 'SOLLUMSATZ',                                                      bold: true,  sub: 'Fixkosten + Wareneinsatz-Puffer' },
               ].map(row => {
                 const total = monthlyData.reduce((s, m) => s + (m as any)[row.key], 0)
                 return (
                   <tr key={row.key} className={`border-b border-gray-50 ${row.bold ? 'bg-gray-50 font-semibold' : ''}`}>
                     <td className={`px-4 py-2 sticky left-0 ${row.bold ? 'bg-gray-50' : 'bg-white'} text-gray-700`}>
-                      {row.label}
+                      <div>{row.label}</div>
+                      {row.sub && <div className="text-gray-400 font-normal text-[10px]">{row.sub}</div>}
                     </td>
                     {monthlyData.map((m, i) => (
                       <td key={i} className="px-3 py-2 text-right text-gray-700">

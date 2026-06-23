@@ -33,16 +33,35 @@ export default function MitarbeiterTab({ salonId, salon, readOnly = false }: { s
 
   const groups: EmployeeRole[] = ['CHEF', 'FRISEUR', 'ORGA', 'AZUBI']
 
+  const totalBrutto = employees.reduce((s, e) => s + e.grossSalary * e.activeMonths.reduce((a, m) => a + m, 0), 0)
+  const productive  = employees.filter(e => e.role === 'FRISEUR' || e.role === 'CHEF')
+
   return (
     <div className="space-y-6">
-      {!readOnly && (
-        <div className="flex justify-end">
+      <div className="flex items-center justify-between gap-4">
+        {employees.length > 0 && (
+          <div className="flex gap-3 flex-wrap">
+            <div className="bg-white border border-gray-200 rounded-xl px-5 py-3">
+              <p className="text-xs text-gray-500">Mitarbeiter gesamt</p>
+              <p className="text-xl font-bold text-gray-900">{employees.length}</p>
+            </div>
+            <div className="bg-white border border-gray-200 rounded-xl px-5 py-3">
+              <p className="text-xs text-gray-500">Produktiv (Friseur/Inhaber)</p>
+              <p className="text-xl font-bold text-gray-900">{productive.length}</p>
+            </div>
+            <div className="bg-white border border-gray-200 rounded-xl px-5 py-3">
+              <p className="text-xs text-gray-500">Bruttolohnsumme / Jahr</p>
+              <p className="text-xl font-bold text-gray-900">{fmt(totalBrutto)} €</p>
+            </div>
+          </div>
+        )}
+        {!readOnly && (
           <button onClick={() => { setEditing(null); setShowForm(true) }}
-            className="flex items-center gap-1.5 bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800">
+            className="flex items-center gap-1.5 bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 shrink-0">
             <Plus className="w-4 h-4" /> Mitarbeiter hinzufügen
           </button>
-        </div>
-      )}
+        )}
+      </div>
 
       {employees.length === 0 ? (
         <div className="bg-white border border-dashed border-gray-300 rounded-2xl p-12 text-center">

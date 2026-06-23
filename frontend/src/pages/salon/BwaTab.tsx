@@ -229,6 +229,35 @@ export default function BwaTab({ salonId, salon }: { salonId: string; salon: Sal
                 )
               })}
             </tbody>
+            {view === 'monatlich' && (
+              <tfoot>
+                <tr className="border-t-2 border-gray-200 bg-gray-50 font-semibold text-xs">
+                  <td className="px-4 py-3 text-gray-900">Gesamt</td>
+                  <td className="px-4 py-3 text-right text-gray-600">{fmt(rows.reduce((s, r) => s + r.sollUmsatz, 0))} €</td>
+                  <td className="px-4 py-3 text-right text-gray-900">{fmt(jahresIst)} €</td>
+                  <td className="px-4 py-3 text-right text-gray-600">{fmt(rows.reduce((s, r) => s + r.istKosten, 0))} €</td>
+                  {(() => {
+                    const totalDB = jahresDB
+                    const totalDBQ = jahresIst > 0 ? (totalDB / jahresIst) * 100 : 0
+                    return <>
+                      <td className={`px-4 py-3 text-right ${totalDB >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                        {totalDB >= 0 ? '+' : ''}{fmt(totalDB)} €
+                      </td>
+                      <td className="px-4 py-3 text-right text-gray-600">{totalDBQ.toFixed(1)} %</td>
+                    </>
+                  })()}
+                  <td className={`px-4 py-3 text-right ${erreichung >= 100 ? 'text-green-600' : erreichung >= 80 ? 'text-amber-500' : 'text-red-500'}`}>
+                    {erreichung.toFixed(1)} %
+                  </td>
+                  {showVJ && <td className="px-4 py-3 text-right text-blue-600">{fmt(jahresVJ)} €</td>}
+                  {showVJ && (
+                    <td className={`px-4 py-3 text-right ${vjGesamt === null ? 'text-gray-300' : vjGesamt >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                      {vjGesamt === null ? '—' : `${vjGesamt >= 0 ? '+' : ''}${vjGesamt.toFixed(1)} %`}
+                    </td>
+                  )}
+                </tr>
+              </tfoot>
+            )}
           </table>
         </div>
       </div>

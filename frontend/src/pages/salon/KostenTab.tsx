@@ -145,16 +145,31 @@ export default function KostenTab({ salonId, salon, readOnly = false }: { salonI
   )
 }
 
+const MONTH_NAMES_SHORT = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez']
+
 function CostModal({ salonId, initial, onClose, onSaved }:
   { salonId: string; initial: CostItem | null; onClose: () => void; onSaved: () => void }) {
   const isEdit = !!initial
   const [category, setCategory] = useState<CostCategory>(initial?.category ?? 'MIETE')
   const [label, setLabel]       = useState(initial?.label ?? '')
-  const [monthly, setMonthly]   = useState(
+
+  // Detect if existing data has varying monthly amounts (= monthly mode)
+  const hasVaryingAmounts = initial && initial.category === 'UNTERNEHMERLOHN' &&
+    initial.amounts.some(v => v !== initial.amounts[0])
+
+  const [monthlyMode, setMonthlyMode] = useState<'flat' | 'monthly'>(
+    hasVaryingAmounts ? 'monthly' : 'flat'
+  )
+  const [monthly, setMonthly] = useState(
     initial ? (initial.category === 'WARENEINSATZ'
       ? (initial.amounts[0] * 100).toString()
       : (initial.amounts.reduce((s, v) => s + v, 0) / 12).toString())
     : ''
+  )
+  const [monthlyAmounts, setMonthlyAmounts] = useState<string[]>(
+    initial?.category === 'UNTERNEHMERLOHN'
+      ? initial.amounts.map(v => v.toString())
+      : Array(12).fill('')
   )
   const [error, setError] = useState('')
 
@@ -168,18 +183,25 @@ function CostModal({ salonId, initial, onClose, onSaved }:
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    const val = parseFloat(monthly) || 0
-    const amounts = category === 'WARENEINSATZ'
-      ? Array(12).fill(val / 100)
-      : Array(12).fill(val)
+    let amounts: number[]
+    if (category === 'WARENEINSATZ') {
+      amounts = Array(12).fill((parseFloat(monthly) || 0) / 100)
+    } else if (category === 'UNTERNEHMERLOHN' && monthlyMode === 'monthly') {
+      amounts = monthlyAmounts.map(v => parseFloat(v) || 0)
+    } else {
+      amounts = Array(12).fill(parseFloat(monthly) || 0)
+    }
     mutation.mutate({ category, label, amounts })
   }
 
   const allCategories = CATEGORY_GROUPS.flatMap(g => g.categories)
+  const jahresSumme = category === 'UNTERNEHMERLOHN' && monthlyMode === 'monthly'
+    ? monthlyAmounts.reduce((s, v) => s + (parseFloat(v) || 0), 0)
+    : (parseFloat(monthly) || 0) * 12
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
         <h2 className="text-lg font-bold text-gray-900 mb-5">
           {isEdit ? 'Kosten bearbeiten' : 'Kosten hinzufügen'}
         </h2>
@@ -202,16 +224,67 @@ function CostModal({ salonId, initial, onClose, onSaved }:
               placeholder={CATEGORY_LABEL[category]}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900" />
           </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">
-              {category === 'WARENEINSATZ' ? 'Wareneinsatz (% vom Umsatz)' : 'Betrag / Monat (€)'}
-            </label>
-            <input type="number" value={monthly} onChange={e => setMonthly(e.target.value)} required min="0" step="0.01"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900" />
-            {category !== 'WARENEINSATZ' && monthly && (
-              <p className="text-xs text-gray-400 mt-1">= {((parseFloat(monthly) || 0) * 12).toLocaleString('de-DE')} € / Jahr</p>
-            )}
-          </div>
+
+          {/* Unternehmerlohn: Toggle Pauschal / Monatlich */}
+          {category === 'UNTERNEHMERLOHN' && (
+            <div className="flex gap-2">
+              {(['flat', 'monthly'] as const).map(mode => (
+                <button key={mode} type="button"
+                  onClick={() => {
+                    setMonthlyMode(mode)
+                    if (mode === 'monthly' && monthly) {
+                      setMonthlyAmounts(Array(12).fill(monthly))
+                    }
+                  }}
+                  className={`flex-1 py-2 text-sm rounded-lg border transition-colors ${
+                    monthlyMode === mode ? 'bg-gray-900 text-white border-gray-900' : 'border-gray-300 text-gray-600 hover:border-gray-500'
+                  }`}>
+                  {mode === 'flat' ? 'Pauschal (gleich / Monat)' : 'Je Monat einzeln'}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Monatsweise Eingabe für Unternehmerlohn */}
+          {category === 'UNTERNEHMERLOHN' && monthlyMode === 'monthly' ? (
+            <div>
+              <div className="grid grid-cols-3 gap-2">
+                {MONTH_NAMES_SHORT.map((m, i) => (
+                  <div key={i}>
+                    <label className="block text-xs text-gray-500 mb-0.5">{m}</label>
+                    <div className="flex items-center gap-1">
+                      <input
+                        type="number" min="0" step="50"
+                        value={monthlyAmounts[i]}
+                        onChange={e => {
+                          const next = [...monthlyAmounts]
+                          next[i] = e.target.value
+                          setMonthlyAmounts(next)
+                        }}
+                        placeholder="0"
+                        className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-gray-400 mt-2 text-right">
+                Jahressumme: <span className="font-semibold text-gray-700">{jahresSumme.toLocaleString('de-DE')} €</span>
+              </p>
+            </div>
+          ) : category !== 'UNTERNEHMERLOHN' || monthlyMode === 'flat' ? (
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">
+                {category === 'WARENEINSATZ' ? 'Wareneinsatz (% vom Umsatz)' : 'Betrag / Monat (€)'}
+              </label>
+              <input type="number" value={monthly} onChange={e => setMonthly(e.target.value)} required min="0" step="0.01"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900" />
+              {category !== 'WARENEINSATZ' && monthly && (
+                <p className="text-xs text-gray-400 mt-1">= {jahresSumme.toLocaleString('de-DE')} € / Jahr</p>
+              )}
+            </div>
+          ) : null}
+
           {error && <p className="text-sm text-red-600">{error}</p>}
           <div className="flex gap-3 pt-2">
             <button type="button" onClick={onClose}
