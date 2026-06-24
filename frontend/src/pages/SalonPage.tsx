@@ -121,24 +121,38 @@ export default function SalonPage() {
               <div className="flex items-center gap-3">
               {WIZARD_STEPS.map((s, i) => (
                 <div key={s.step} className="flex items-center gap-2">
-                  <div className={`flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold border-2 transition-all ${
-                    wizardStep === s.step
-                      ? 'bg-white text-gray-900 border-white'
-                      : wizardStep > s.step
-                        ? 'bg-green-500 border-green-500 text-white'
-                        : 'border-gray-600 text-gray-500'
-                  }`}>
-                    {wizardStep > s.step ? '✓' : s.step}
-                  </div>
-                  <span className={`text-sm hidden sm:inline ${wizardStep === s.step ? 'font-semibold' : 'text-gray-400'}`}>
-                    {s.label}
-                  </span>
+                  <button
+                    onClick={() => { setWizardStep(s.step); setTab(s.tab) }}
+                    className={`flex items-center gap-1.5 hover:opacity-80 transition-opacity ${wizardStep === s.step ? '' : 'cursor-pointer'}`}>
+                    <div className={`flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold border-2 transition-all ${
+                      wizardStep === s.step
+                        ? 'bg-white text-gray-900 border-white'
+                        : wizardStep > s.step
+                          ? 'bg-green-500 border-green-500 text-white'
+                          : 'border-gray-600 text-gray-500'
+                    }`}>
+                      {wizardStep > s.step ? '✓' : s.step}
+                    </div>
+                    <span className={`text-sm hidden sm:inline ${wizardStep === s.step ? 'font-semibold text-white' : wizardStep > s.step ? 'text-green-400' : 'text-gray-500'}`}>
+                      {s.label}
+                    </span>
+                  </button>
                   {i < WIZARD_STEPS.length - 1 && <ChevronRight className="w-4 h-4 text-gray-600" />}
                 </div>
               ))}
               </div>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              {wizardStep > 1 && (
+                <button onClick={() => {
+                  const prev = wizardStep - 1 as 1 | 2 | 3
+                  setWizardStep(prev)
+                  setTab(WIZARD_STEPS[prev - 1].tab)
+                }}
+                  className="flex items-center gap-1 text-gray-400 hover:text-white text-sm transition-colors px-2 py-1.5">
+                  <ChevronRight className="w-4 h-4 rotate-180" /> {WIZARD_STEPS[wizardStep - 2].label}
+                </button>
+              )}
               <button onClick={wizardNext}
                 className="flex items-center gap-1.5 bg-white text-gray-900 px-4 py-1.5 rounded-lg text-sm font-semibold hover:bg-gray-100 transition-colors">
                 {wizardStep < 3 ? (
@@ -147,7 +161,7 @@ export default function SalonPage() {
                   'Abschließen ✓'
                 )}
               </button>
-              <button onClick={() => setWizardStep(null)} className="text-gray-500 hover:text-white">
+              <button onClick={() => setWizardStep(null)} className="text-gray-500 hover:text-white ml-1">
                 <X className="w-4 h-4" />
               </button>
             </div>
