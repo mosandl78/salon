@@ -5,7 +5,6 @@ import { Scissors, ArrowLeft, Play } from 'lucide-react'
 import api from '../api'
 import type { Salon } from '../types'
 import UebersichtTab    from './salon/UebersichtTab'
-import SetupGuide       from './salon/SetupGuide'
 import MitarbeiterTab   from './salon/MitarbeiterTab'
 import KostenTab        from './salon/KostenTab'
 import LohnfaktorTab    from './salon/LohnfaktorTab'
@@ -14,25 +13,27 @@ import ControllingTab   from './salon/ControllingTab'
 import BwaTab           from './salon/BwaTab'
 import LiquiditaetTab   from './salon/LiquiditaetTab'
 import SimulatorTab     from './salon/SimulatorTab'
-import EinstellungenTab from './salon/EinstellungenTab'
 
-const TABS = [
-  { id: 'uebersicht',    label: 'Übersicht' },
-  { id: 'mitarbeiter',   label: 'Mitarbeiter' },
-  { id: 'kosten',        label: 'Kosten' },
-  { id: 'lohnfaktor',    label: 'Lohnfaktor' },
-  { id: 'preise',        label: 'Preise' },
-  { id: 'controlling',   label: 'Controlling' },
-  { id: 'bwa',           label: 'BWA' },
-  { id: 'liquiditaet',   label: 'Liquidität' },
-  { id: 'simulator',     label: 'Simulator' },
-  { id: 'einstellungen', label: 'Einstellungen' },
+const PREISKALK_TABS = [
+  { id: 'uebersicht',  label: 'Übersicht' },
+  { id: 'mitarbeiter', label: 'Mitarbeiter' },
+  { id: 'kosten',      label: 'Kosten' },
+  { id: 'preise',      label: 'Preise' },
+  { id: 'lohnfaktor',  label: 'Lohnfaktor' },
+  { id: 'simulator',   label: 'Simulation' },
+]
+
+const CONTROLLING_TABS = [
+  { id: 'controlling', label: 'Controlling' },
+  { id: 'bwa',         label: 'BWA' },
+  { id: 'liquiditaet', label: 'Liquidität' },
 ]
 
 export default function DemoPage() {
   const navigate = useNavigate()
   const [tab, setTab] = useState('uebersicht')
   const prevToken = useRef<string | null>(null)
+  const segment = CONTROLLING_TABS.some(t => t.id === tab) ? 'controlling' : 'preiskalk'
 
   const { data, isLoading, error } = useQuery<{ salon: Salon; token: string }>({
     queryKey: ['demo'],
@@ -102,28 +103,34 @@ export default function DemoPage() {
         </div>
       </header>
 
-      {/* Tabs */}
+      {/* Navigation — eine Leiste, zwei Gruppen */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
-          {/* Mobile: Select-Dropdown */}
           <div className="sm:hidden py-2">
-            <select
-              value={tab}
-              onChange={e => setTab(e.target.value)}
+            <select value={tab} onChange={e => setTab(e.target.value)}
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-gray-900">
-              {TABS.map(t => (
-                <option key={t.id} value={t.id}>{t.label}</option>
-              ))}
+              <optgroup label="✂️ Preiskalkulation">
+                {PREISKALK_TABS.map(t => <option key={t.id} value={t.id}>{t.label}</option>)}
+              </optgroup>
+              <optgroup label="📊 Salon Controlling">
+                {CONTROLLING_TABS.map(t => <option key={t.id} value={t.id}>{t.label}</option>)}
+              </optgroup>
             </select>
           </div>
-          {/* Desktop: Tab-Leiste */}
-          <nav className="hidden sm:flex gap-0 overflow-x-auto">
-            {TABS.map(t => (
+          <nav className="hidden sm:flex items-end gap-0 overflow-x-auto">
+            {PREISKALK_TABS.map(t => (
               <button key={t.id} onClick={() => setTab(t.id)}
                 className={`px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
-                  tab === t.id
-                    ? 'accent-underline accent-text border-b-2'
-                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                  tab === t.id ? 'border-gray-900 text-gray-900' : 'border-transparent text-gray-400 hover:text-gray-600'
+                }`}>
+                {t.label}
+              </button>
+            ))}
+            <div className="mx-2 mb-2 self-end h-5 w-px bg-gray-200 shrink-0" />
+            {CONTROLLING_TABS.map(t => (
+              <button key={t.id} onClick={() => setTab(t.id)}
+                className={`px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
+                  tab === t.id ? 'border-gray-900 text-gray-900' : 'border-transparent text-gray-400 hover:text-gray-600'
                 }`}>
                 {t.label}
               </button>
@@ -134,10 +141,7 @@ export default function DemoPage() {
 
       {/* Content */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
-        {tab === 'uebersicht' && (
-          <SetupGuide salon={salon} salonId={salonId} onNavigate={setTab} />
-        )}
-        {tab === 'uebersicht'  && <UebersichtTab  salonId={salonId} salon={salon} />}
+        {tab === 'uebersicht'  && <UebersichtTab  salonId={salonId} salon={salon} onNavigate={setTab} onStartWizard={() => {}} />}
         {tab === 'mitarbeiter' && <MitarbeiterTab salonId={salonId} salon={salon} readOnly />}
         {tab === 'kosten'      && <KostenTab      salonId={salonId} salon={salon} readOnly />}
         {tab === 'lohnfaktor'  && <LohnfaktorTab  salonId={salonId} salon={salon} />}
@@ -145,8 +149,7 @@ export default function DemoPage() {
         {tab === 'controlling' && <ControllingTab salonId={salonId} salon={salon} readOnly />}
         {tab === 'bwa'         && <BwaTab         salonId={salonId} salon={salon} />}
         {tab === 'liquiditaet' && <LiquiditaetTab salonId={salonId} salon={salon} />}
-        {tab === 'simulator'     && <SimulatorTab     salonId={salonId} salon={salon} />}
-        {tab === 'einstellungen' && <EinstellungenTab salonId={salonId} salon={salon} readOnly />}
+        {tab === 'simulator'   && <SimulatorTab   salonId={salonId} salon={salon} />}
       </div>
 
       {/* Sticky CTA */}

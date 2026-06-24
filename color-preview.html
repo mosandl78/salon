@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SALON — Farbkonzept Vergleich</title>
+  <link href="https://fonts.googleapis.com/css2?family=Kaushan+Script&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: #f3f4f6; padding: 32px 24px; }
+
+    h1 { text-align: center; font-size: 14px; color: #6b7280; letter-spacing: .05em; text-transform: uppercase; margin-bottom: 32px; }
+
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; max-width: 1000px; margin: 0 auto; }
+
+    .card { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,.08); }
+
+    .label { text-align: center; padding: 14px; font-size: 13px; font-weight: 600; color: white; letter-spacing: .04em; }
+
+    /* ── ROSA ── */
+    .rosa { --c: #D4848E; --cl: #f9eef0; --cd: #b86870; }
+    .rosa .label { background: var(--c); }
+    .rosa .accent-border { border-color: var(--c) !important; }
+    .rosa .accent-text   { color: var(--c) !important; }
+    .rosa .accent-bg     { background: var(--cl) !important; }
+    .rosa .tab-active    { border-bottom: 2px solid var(--c); color: #111; }
+    .rosa .check         { color: var(--c); }
+    .rosa .btn-primary   { background: #111; color: white; }
+    .rosa .btn-outline   { border: 1.5px solid var(--c); color: var(--c); background: white; }
+    .rosa .focus-ring    { box-shadow: 0 0 0 3px rgba(212,132,142,.25); border-color: var(--c); }
+    .rosa .stat-num      { color: var(--c); }
+    .rosa .pill          { background: var(--cl); color: var(--cd); }
+
+    /* ── MINT ── */
+    .mint { --c: #5BA898; --cl: #eaf4f1; --cd: #3d7a6d; }
+    .mint .label { background: var(--c); }
+    .mint .accent-border { border-color: var(--c) !important; }
+    .mint .accent-text   { color: var(--c) !important; }
+    .mint .accent-bg     { background: var(--cl) !important; }
+    .mint .tab-active    { border-bottom: 2px solid var(--c); color: #111; }
+    .mint .check         { color: var(--c); }
+    .mint .btn-primary   { background: #111; color: white; }
+    .mint .btn-outline   { border: 1.5px solid var(--c); color: var(--c); background: white; }
+    .mint .focus-ring    { box-shadow: 0 0 0 3px rgba(91,168,152,.25); border-color: var(--c); }
+    .mint .stat-num      { color: var(--c); }
+    .mint .pill          { background: var(--cl); color: var(--cd); }
+
+    /* ── Shared UI ── */
+    .ui { padding: 0 0 24px; }
+
+    /* Nav */
+    .nav { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid #f0f0f0; }
+    .logo { display: flex; align-items: center; gap: 8px; }
+    .logo-icon { font-size: 16px; }
+    .logo-name { font-weight: 700; font-size: 15px; color: #111; }
+    .logo-sub  { font-family: 'Kaushan Script', cursive; font-size: 13px; color: #9ca3af; }
+    .nav-btns { display: flex; gap: 8px; }
+    .btn { padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1.5px solid transparent; }
+    .btn-ghost { background: none; border-color: #e5e7eb; color: #374151; }
+
+    /* Tabs */
+    .tabs { display: flex; gap: 0; padding: 0 20px; border-bottom: 1px solid #f0f0f0; }
+    .tab { padding: 10px 14px; font-size: 12px; font-weight: 500; color: #9ca3af; border-bottom: 2px solid transparent; cursor: pointer; }
+
+    /* Stats */
+    .stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; padding: 16px 20px; }
+    .stat { background: #fafafa; border-radius: 12px; padding: 14px; border: 1px solid #f0f0f0; }
+    .stat-label { font-size: 10px; color: #9ca3af; margin-bottom: 4px; text-transform: uppercase; letter-spacing: .04em; }
+    .stat-num { font-size: 22px; font-weight: 700; color: #111; }
+    .stat-sub { font-size: 11px; color: #9ca3af; margin-top: 2px; }
+
+    /* Pricing card */
+    .pricing { margin: 0 20px 16px; background: #111; border-radius: 14px; padding: 20px; color: white; border-top: 4px solid transparent; }
+    .pricing-plan { font-size: 11px; color: #9ca3af; margin-bottom: 4px; text-transform: uppercase; letter-spacing: .06em; }
+    .pricing-price { font-size: 36px; font-weight: 700; margin-bottom: 2px; }
+    .pricing-sub { font-size: 11px; color: #6b7280; margin-bottom: 16px; }
+    .pricing-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .pricing-list li { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #d1d5db; }
+    .check-icon { font-size: 13px; }
+
+    /* Form */
+    .form-section { padding: 0 20px 4px; }
+    .form-label { font-size: 10px; font-weight: 600; color: #374151; margin-bottom: 4px; display: block; text-transform: uppercase; letter-spacing: .04em; }
+    .form-input { width: 100%; border: 1.5px solid #e5e7eb; border-radius: 8px; padding: 8px 12px; font-size: 12px; color: #111; margin-bottom: 10px; font-family: 'Inter', sans-serif; outline: none; }
+    .btn-full { width: 100%; padding: 10px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; margin-top: 4px; }
+
+    /* Pill badge */
+    .pill { display: inline-block; padding: 3px 10px; border-radius: 99px; font-size: 10px; font-weight: 600; }
+
+    /* Footer */
+    .footer { border-top: 1px solid #f0f0f0; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; }
+    .footer-links { display: flex; gap: 14px; }
+    .footer-link { font-size: 11px; color: #9ca3af; text-decoration: none; }
+  </style>
+</head>
+<body>
+
+<h1>Farbkonzept Vergleich — A: Rosé &nbsp;|&nbsp; B: Mint</h1>
+
+<div class="grid">
+
+  <!-- ══ ROSA ══ -->
+  <div class="card rosa">
+    <div class="label">A — Rosé &nbsp;#D4848E</div>
+    <div class="ui">
+
+      <!-- Nav -->
+      <div class="nav">
+        <div class="logo">
+          <span class="logo-icon">✂</span>
+          <span class="logo-name">SALON</span>
+          <span class="logo-sub">by Peter Lehmann</span>
+        </div>
+        <div class="nav-btns">
+          <button class="btn btn-ghost">Login</button>
+          <button class="btn btn-primary" style="background:#111;color:white;border-color:#111">Neuen Salon eröffnen</button>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <div class="tab tab-active accent-text" style="border-bottom:2px solid #D4848E">Übersicht</div>
+        <div class="tab">Mitarbeiter</div>
+        <div class="tab">Kosten</div>
+        <div class="tab">Preise</div>
+        <div class="tab">Controlling</div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-label">Sollumsatz</div>
+          <div class="stat-num accent-text">8.240 €</div>
+          <div class="stat-sub">pro Monat</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Lohnfaktor</div>
+          <div class="stat-num accent-text">3,2×</div>
+          <div class="stat-sub">Zielwert</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Mitarbeiter</div>
+          <div class="stat-num" style="color:#111">4</div>
+          <div class="stat-sub"><span class="pill accent-bg accent-text">aktiv</span></div>
+        </div>
+      </div>
+
+      <!-- Pricing -->
+      <div class="pricing accent-border" style="border-top:4px solid #D4848E">
+        <div class="pricing-plan">SALON Pro</div>
+        <div class="pricing-price">129 €</div>
+        <div class="pricing-sub">pro Jahr · netto zzgl. MwSt.</div>
+        <ul class="pricing-list">
+          <li><span class="check-icon check">✓</span> Unbegrenzte Mitarbeiter</li>
+          <li><span class="check-icon check">✓</span> Alle Dienstleistungen kalkulieren</li>
+          <li><span class="check-icon check">✓</span> Lohnfaktor & Sollumsatz</li>
+          <li><span class="check-icon check">✓</span> Jahresverlauf & Controlling</li>
+        </ul>
+      </div>
+
+      <!-- Form -->
+      <div class="form-section">
+        <label class="form-label">E-Mail</label>
+        <input class="form-input focus-ring" value="anja@mein-salon.de" readonly />
+        <label class="form-label">Passwort</label>
+        <input class="form-input" type="password" value="••••••••" readonly />
+        <button class="btn-full btn-primary" style="background:#111;color:white">Neuen Salon eröffnen →</button>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <div class="logo">
+        <span style="font-size:12px">✂</span>
+        <span style="font-size:12px;font-weight:700">SALON</span>
+        <span style="font-family:'Kaushan Script',cursive;font-size:11px;color:#9ca3af">by Peter Lehmann</span>
+      </div>
+      <div class="footer-links">
+        <a class="footer-link accent-text" href="#">Kontakt</a>
+        <a class="footer-link" href="#">Impressum</a>
+        <a class="footer-link" href="#">Datenschutz</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ MINT ══ -->
+  <div class="card mint">
+    <div class="label">B — Mint &nbsp;#5BA898</div>
+    <div class="ui">
+
+      <!-- Nav -->
+      <div class="nav">
+        <div class="logo">
+          <span class="logo-icon">✂</span>
+          <span class="logo-name">SALON</span>
+          <span class="logo-sub">by Peter Lehmann</span>
+        </div>
+        <div class="nav-btns">
+          <button class="btn btn-ghost">Login</button>
+          <button class="btn btn-primary" style="background:#111;color:white;border-color:#111">Neuen Salon eröffnen</button>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <div class="tab tab-active accent-text" style="border-bottom:2px solid #5BA898">Übersicht</div>
+        <div class="tab">Mitarbeiter</div>
+        <div class="tab">Kosten</div>
+        <div class="tab">Preise</div>
+        <div class="tab">Controlling</div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-label">Sollumsatz</div>
+          <div class="stat-num accent-text">8.240 €</div>
+          <div class="stat-sub">pro Monat</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Lohnfaktor</div>
+          <div class="stat-num accent-text">3,2×</div>
+          <div class="stat-sub">Zielwert</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Mitarbeiter</div>
+          <div class="stat-num" style="color:#111">4</div>
+          <div class="stat-sub"><span class="pill accent-bg accent-text">aktiv</span></div>
+        </div>
+      </div>
+
+      <!-- Pricing -->
+      <div class="pricing accent-border" style="border-top:4px solid #5BA898">
+        <div class="pricing-plan">SALON Pro</div>
+        <div class="pricing-price">129 €</div>
+        <div class="pricing-sub">pro Jahr · netto zzgl. MwSt.</div>
+        <ul class="pricing-list">
+          <li><span class="check-icon check">✓</span> Unbegrenzte Mitarbeiter</li>
+          <li><span class="check-icon check">✓</span> Alle Dienstleistungen kalkulieren</li>
+          <li><span class="check-icon check">✓</span> Lohnfaktor & Sollumsatz</li>
+          <li><span class="check-icon check">✓</span> Jahresverlauf & Controlling</li>
+        </ul>
+      </div>
+
+      <!-- Form -->
+      <div class="form-section">
+        <label class="form-label">E-Mail</label>
+        <input class="form-input focus-ring" value="anja@mein-salon.de" readonly />
+        <label class="form-label">Passwort</label>
+        <input class="form-input" type="password" value="••••••••" readonly />
+        <button class="btn-full btn-primary" style="background:#111;color:white">Neuen Salon eröffnen →</button>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <div class="logo">
+        <span style="font-size:12px">✂</span>
+        <span style="font-size:12px;font-weight:700">SALON</span>
+        <span style="font-family:'Kaushan Script',cursive;font-size:11px;color:#9ca3af">by Peter Lehmann</span>
+      </div>
+      <div class="footer-links">
+        <a class="footer-link accent-text" href="#">Kontakt</a>
+        <a class="footer-link" href="#">Impressum</a>
+        <a class="footer-link" href="#">Datenschutz</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

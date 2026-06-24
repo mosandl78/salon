@@ -77,8 +77,10 @@ calculationRouter.get('/:salonId/calculation', authenticate, async (req: any, re
 
   // ── Kosten pro Minute ───────────────────────────────────────────────
   const totalMinutesPerYear = workDaysPerYear * workHoursPerDay * 60
-  const pkProMinute         = totalPersonalkosten / totalMinutesPerYear
-  const gkProMinute         = totalGemeinkosten   / totalMinutesPerYear
+  // Auf 8 Stellen runden — gleiche Präzision wie im Response, damit
+  // Frontend-Schätzung und Backend-Berechnung identisch sind
+  const pkProMinute = Math.round((totalPersonalkosten / totalMinutesPerYear) * 1e8) / 1e8
+  const gkProMinute = Math.round((totalGemeinkosten   / totalMinutesPerYear) * 1e8) / 1e8
 
   // ── Preise je Dienstleistung ─────────────────────────────────────────
   const servicePrices = salon.services.map(svc => {
@@ -110,8 +112,8 @@ calculationRouter.get('/:salonId/calculation', authenticate, async (req: any, re
     mindestumsatzNet:     Math.round(mindestumsatzNet),
     bruttolohnsumme:      Math.round(bruttolohnsumme),
     lohnfaktor:           Math.round(lohnfaktor * 100) / 100,
-    pkProMinute:          Math.round(pkProMinute * 10000) / 10000,
-    gkProMinute:          Math.round(gkProMinute * 10000) / 10000,
+    pkProMinute:          Math.round(pkProMinute * 1e8) / 1e8,
+    gkProMinute:          Math.round(gkProMinute * 1e8) / 1e8,
     sollUmsatzPerEmployee,
     servicePrices,
   })

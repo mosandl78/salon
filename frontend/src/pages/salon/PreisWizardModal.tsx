@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { ChevronRight, ChevronLeft, Check, Wand2 } from 'lucide-react'
 import api from '../../api'
-import type { ServiceCategory, CalculationResult } from '../../types'
+import type { Service, ServiceCategory, CalculationResult } from '../../types'
 
 // ─── Presets ────────────────────────────────────────────────────────────────
 
@@ -165,26 +165,45 @@ function fmt(n: number) {
 export default function PreisWizardModal({
   salonId,
   calc,
+  initial,
   onClose,
   onSaved,
 }: {
   salonId: string
   calc: CalculationResult | undefined
+  initial?: Service | null
   onClose: () => void
   onSaved: () => void
 }) {
-  const [step, setStep] = useState(1)
+  const isEdit = !!initial
+  // Beim Bearbeiten: Schritt 1 (Kategorie) überspringen, direkt zu Schritt 2
+  const [step, setStep] = useState(isEdit ? 2 : 1)
   const TOTAL_STEPS = 5
 
-  const [state, setState] = useState<WizardState>({
-    category: 'WASCHEN_SCHNEIDEN_FOENEN',
-    name: '',
-    phases: { vorbereitung: 5, technisch: 30, einwirkzeit: 0, finish: 25 },
-    materialMode: 'flat',
-    materialItems: [{ label: 'Material', cost: 4 }],
-    materialFlat: 4,
-    utilization: 80,
-    profitMarkup: 10,
+  const [state, setState] = useState<WizardState>(() => {
+    if (initial) {
+      return {
+        category:      initial.category,
+        name:          initial.name,
+        // Phasen können nicht wiederhergestellt werden — gesamte Dauer in "technisch"
+        phases:        { vorbereitung: 0, technisch: initial.durationMinutes, einwirkzeit: 0, finish: 0 },
+        materialMode:  'flat',
+        materialItems: [{ label: 'Material', cost: initial.materialCost }],
+        materialFlat:  initial.materialCost,
+        utilization:   initial.utilizationPct,
+        profitMarkup:  initial.profitMarkup,
+      }
+    }
+    return {
+      category: 'WASCHEN_SCHNEIDEN_FOENEN',
+      name: '',
+      phases: { vorbereitung: 5, technisch: 30, einwirkzeit: 0, finish: 25 },
+      materialMode: 'flat',
+      materialItems: [{ label: 'Material', cost: 4 }],
+      materialFlat: 4,
+      utilization: 80,
+      profitMarkup: 10,
+    }
   })
 
   const preset = PRESETS.find(p => p.category === state.category)!
@@ -212,7 +231,9 @@ export default function PreisWizardModal({
   )
 
   const mutation = useMutation({
-    mutationFn: (data: any) => api.post(`/salons/${salonId}/services`, data),
+    mutationFn: (data: any) => isEdit
+      ? api.patch(`/salons/${salonId}/services/${initial!.id}`, data)
+      : api.post(`/salons/${salonId}/services`, data),
     onSuccess: onSaved,
   })
 
@@ -495,8 +516,9 @@ export default function PreisWizardModal({
                       const vatRate = calc?.vatRate ?? 0.19
                       const selbst = estimate.selbstkosten
                       const netto = v / (1 + vatRate)
-                      const markup = selbst > 0 ? Math.round(((netto / selbst) - 1) * 100) : 0
-                      setState(s => ({ ...s, profitMarkup: Math.max(0, markup) }))
+                      // Exakter Float — nicht runden, sonst rechnet Backend anders zurück
+                      const markup = selbst > 0 ? ((netto / selbst) - 1) * 100 : 0
+                      setState(s => ({ ...s, profitMarkup: Math.max(0, Math.round(markup)) }))
                       save(Math.max(0, markup))
                     }
                   }}
@@ -523,7 +545,9 @@ export default function PreisWizardModal({
         <div className="px-6 pt-6 pb-4 border-b border-gray-100 shrink-0">
           <div className="flex items-center gap-2 mb-4">
             <Wand2 className="w-5 h-5 text-gray-400" />
-            <h2 className="text-base font-bold text-gray-900">Geführte Preiskalkulation</h2>
+            <h2 className="text-base font-bold text-gray-900">
+              {isEdit ? `${initial!.name} bearbeiten` : 'Preiskalkulation'}
+            </h2>
           </div>
           {/* Progress bar */}
           <div className="flex items-center gap-1">
@@ -552,12 +576,15 @@ export default function PreisWizardModal({
         {/* Footer */}
         {step > 1 && (
           <div className="px-6 pb-6 pt-4 border-t border-gray-100 shrink-0 flex gap-3">
-            <button
-              onClick={() => setStep(s => s - 1)}
-              className="flex items-center gap-1.5 border border-gray-300 text-gray-700 rounded-xl px-4 py-2.5 text-sm hover:bg-gray-50"
-            >
-              <ChevronLeft className="w-4 h-4" /> Zurück
-            </button>
+            {/* Beim Bearbeiten: Zurück nur bis Schritt 2 (Kategorie überspringen) */}
+            {step > (isEdit ? 2 : 1) && (
+              <button
+                onClick={() => setStep(s => s - 1)}
+                className="flex items-center gap-1.5 border border-gray-300 text-gray-700 rounded-xl px-4 py-2.5 text-sm hover:bg-gray-50"
+              >
+                <ChevronLeft className="w-4 h-4" /> Zurück
+              </button>
+            )}
             <div className="flex-1" />
             <button onClick={onClose} className="text-sm text-gray-400 hover:text-gray-700 px-3">
               Abbrechen
