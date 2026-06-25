@@ -222,7 +222,7 @@ export default function ControllingTab({ salonId, salon, readOnly = false }: { s
           <h2 className="text-sm font-semibold text-gray-700">Provision {selectedYear}</h2>
           <span className="text-xs text-gray-400">({(PROVISION_RATE * 100).toFixed(0)} % auf Mehrleistung)</span>
         </div>
-        <table className="w-full text-sm">
+        <div className="overflow-x-auto"><table className="w-full text-sm">
           <thead>
             <tr className="text-xs text-gray-400 border-b border-gray-100">
               <th className="text-left px-5 py-2 font-medium">Mitarbeiter</th>
@@ -256,7 +256,7 @@ export default function ControllingTab({ salonId, salon, readOnly = false }: { s
               <td className="px-5 py-3 text-right text-green-700 font-bold">{fmt(provisionData.reduce((s, p) => s + p.provision, 0))} €</td>
             </tr>
           </tfoot>
-        </table>
+        </table></div>
       </div>
     </div>
   )

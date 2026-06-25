@@ -171,7 +171,7 @@ function AdminUsers() {
         <p className="text-sm text-gray-400">Lädt…</p>
       ) : (
         <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
-          <table className="w-full text-sm">
+          <div className="overflow-x-auto"><table className="w-full text-sm">
             <thead>
               <tr className="text-xs text-gray-400 bg-gray-50 border-b border-gray-100">
                 <th className="text-left px-5 py-3 font-medium">Benutzer</th>
@@ -232,7 +232,7 @@ function AdminUsers() {
                 <tr><td colSpan={7} className="px-5 py-8 text-center text-sm text-gray-400">Keine Benutzer gefunden</td></tr>
               )}
             </tbody>
-          </table>
+          </table></div>
         </div>
       )}
 

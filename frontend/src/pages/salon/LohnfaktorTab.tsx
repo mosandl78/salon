@@ -128,7 +128,7 @@ export default function LohnfaktorTab({ salonId, salon }: { salonId: string; sal
         <div className="px-5 py-3 bg-gray-50 border-b border-gray-200">
           <h2 className="text-sm font-semibold text-gray-700">Sollumsatz je produktivem Mitarbeiter</h2>
         </div>
-        <table className="w-full text-sm">
+        <div className="overflow-x-auto"><table className="w-full text-sm">
           <thead>
             <tr className="text-xs text-gray-400 border-b border-gray-100">
               <th className="text-left px-5 py-2 font-medium">Name</th>
@@ -156,7 +156,7 @@ export default function LohnfaktorTab({ salonId, salon }: { salonId: string; sal
               )
             })}
           </tbody>
-        </table>
+        </table></div>
       </div>
 
       {/* Kosten pro Minute */}

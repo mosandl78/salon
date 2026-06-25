@@ -80,7 +80,7 @@ export default function PreiseTab({ salonId, salon, readOnly = false }: { salonI
           <p className="text-sm text-gray-500 mt-1">Füge Dienstleistungen hinzu um Preise zu kalkulieren.</p>
         </div>
       ) : (
-        <div className="overflow-x-auto"><div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
+        <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden"><div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="text-xs text-gray-400 border-b border-gray-100 bg-gray-50">
