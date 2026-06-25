@@ -12,7 +12,7 @@ const SYSTEM_CARDS = [
     page: 'mitarbeiter',
     computedKey: 'neuer_ma',
     title: 'Weiterer Mitarbeiter (Ø-Gehalt)',
-    body: 'Bei Ø {avgGross} € Brutto/Monat — Mindestumsatz steigt entsprechend.',
+    body: 'Bei einem neuen Mitarbeiter mit Durchschnittsgehalt — Mindestumsatz steigt entsprechend.',
     sortOrder: 0,
   },
   {
@@ -54,6 +54,9 @@ const SYSTEM_CARDS = [
 ]
 
 export async function seedSystemInfoCards() {
+  // Alte Karten ohne computedKey (Legacy-Amber-Karten) entfernen
+  await prisma.infoCard.deleteMany({ where: { computedKey: null } })
+
   for (const card of SYSTEM_CARDS) {
     const existing = await prisma.infoCard.findFirst({ where: { computedKey: card.computedKey } })
     if (!existing) {

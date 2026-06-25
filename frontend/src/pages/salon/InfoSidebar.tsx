@@ -47,11 +47,11 @@ export default function InfoSidebar({ page, computedValues, onSimulation }: Prop
           )
         }
 
-        // Amber card: static admin-added card (no computedKey, or computedKey with no value available)
+        // Static card (no computedKey or no computed value available)
         return (
-          <div key={card.id} className="bg-amber-50 border border-amber-200 rounded-2xl p-4">
-            <p className="text-xs font-semibold text-amber-800 mb-1">{card.title}</p>
-            <p className="text-xs text-amber-700 leading-relaxed whitespace-pre-line">{card.body}</p>
+          <div key={card.id} className="bg-white border border-gray-200 rounded-2xl p-4">
+            <p className="text-xs font-semibold text-gray-500 mb-1">{card.title}</p>
+            <p className="text-xs leading-relaxed text-gray-500 whitespace-pre-line">{card.body}</p>
           </div>
         )
       })}
