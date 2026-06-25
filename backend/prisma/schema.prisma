@@ -171,3 +171,13 @@ model ActualRevenue {
 
   @@unique([employeeId, month, year])
 }
+
+model InfoCard {
+  id        String   @id @default(cuid())
+  page      String   // 'mitarbeiter' | 'kosten'
+  title     String
+  body      String
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

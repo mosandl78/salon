@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Plus, Pencil, Trash2, Receipt } from 'lucide-react'
 import api from '../../api'
 import type { Salon, CostItem, CostCategory, CalculationResult } from '../../types'
+import InfoSidebar from './InfoSidebar'
 
 const CATEGORY_GROUPS: { label: string; categories: CostCategory[] }[] = [
   { label: 'Raumkosten',      categories: ['MIETE', 'NEBENKOSTEN', 'STROM', 'WASSER'] },
@@ -48,12 +49,41 @@ export default function KostenTab({ salonId, salon, readOnly = false }: { salonI
     },
   })
 
-  const totalJahr = costs
-    .filter(c => c.category !== 'WARENEINSATZ')
-    .reduce((s, c) => s + annual(c.amounts), 0)
+  const totalJahr        = costs.filter(c => c.category !== 'WARENEINSATZ').reduce((s, c) => s + annual(c.amounts), 0)
+  const wareneinsatzRate = calc?.wareneinsatzRate ?? 0.12
+  const steigerung3pct   = Math.round(totalJahr * 0.03)
+  const steigerungMindest = wareneinsatzRate < 1 ? Math.round(steigerung3pct / (1 - wareneinsatzRate)) : steigerung3pct
+  const miete            = costs.filter(c => c.category === 'MIETE').reduce((s, c) => s + annual(c.amounts), 0)
+
+  const insights = costs.length > 0 && calc ? [
+    {
+      title: 'Fixkosten gesamt / Jahr',
+      value: `${fmt(totalJahr)} €`,
+      body: `Ø ${fmt(Math.round(totalJahr / 12))} € / Monat ohne Wareneinsatz`,
+      highlight: true,
+    },
+    {
+      title: '3 % Kostensteigerung',
+      value: `+ ${fmt(steigerung3pct)} € / Jahr`,
+      body: `Erhöht den Mindestumsatz um ${fmt(steigerungMindest)} € / Jahr. Preise sollten regelmäßig angepasst werden.`,
+    },
+    ...(miete > 0 ? [{
+      title: 'Anteil Raumkosten',
+      value: `${((miete / totalJahr) * 100).toFixed(1)} %`,
+      body: `${fmt(miete)} € / Jahr. Branchenüblich sind 10–15 % der Gesamtkosten.`,
+    }] : []),
+    {
+      title: '1 € Fixkosten braucht…',
+      value: `${(1 / (1 - wareneinsatzRate)).toFixed(2)} € Umsatz`,
+      body: `Bei ${(wareneinsatzRate * 100).toFixed(0)} % Wareneinsatz-Quote musst du ${(1 / (1 - wareneinsatzRate)).toFixed(2)} € einnehmen um 1 € Fixkosten zu decken.`,
+    },
+  ] : []
 
   return (
-    <div className="space-y-6">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+
+      {/* Hauptinhalt */}
+      <div className="lg:col-span-2 space-y-6">
       <div className="flex items-center justify-between">
         <div className="bg-white border border-gray-200 rounded-xl px-5 py-3">
           <p className="text-xs text-gray-500">Gesamtkosten / Jahr</p>
@@ -141,7 +171,14 @@ export default function KostenTab({ salonId, salon, readOnly = false }: { salonI
           }}
         />
       )}
-    </div>
+      </div> {/* Ende Hauptinhalt */}
+
+      {/* Sidebar */}
+      <div className="lg:col-span-1">
+        <InfoSidebar page="kosten" insights={insights} />
+      </div>
+
+    </div> {/* Ende grid */}
   )
 }
 

@@ -13,6 +13,7 @@ import { openingHoursRouter } from './routes/opening-hours'
 import { calculationRouter }  from './routes/calculation'
 import { adminRouter }        from './routes/admin'
 import { demoRouter }         from './routes/demo'
+import { infoCardsRouter }    from './routes/infoCards'
 import { contactRouter }      from './routes/contact'
 import { requireNotDemo }     from './middleware/demo'
 
@@ -38,6 +39,7 @@ app.use('/api/salons', servicesRouter)
 app.use('/api/salons', actualsRouter)
 app.use('/api/salons', openingHoursRouter)
 app.use('/api/salons', calculationRouter)
+app.use('/api/info-cards', infoCardsRouter)
 app.use('/api/admin',   adminRouter)
 app.use('/api/demo',    demoRouter)
 app.use('/api/contact', contactRouter)

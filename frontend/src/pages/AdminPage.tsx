@@ -19,8 +19,9 @@ const PLAN_COLOR: Record<PricingPlan, string> = {
 }
 
 const TABS = [
-  { id: 'dashboard', label: 'Dashboard' },
-  { id: 'users',     label: 'Benutzer' },
+  { id: 'dashboard',  label: 'Dashboard' },
+  { id: 'users',      label: 'Benutzer' },
+  { id: 'infocards',  label: 'Hinweise' },
 ]
 
 export default function AdminPage() {
@@ -63,6 +64,7 @@ export default function AdminPage() {
       <div className="max-w-5xl mx-auto px-6 py-8">
         {tab === 'dashboard' && <AdminDashboard />}
         {tab === 'users'     && <AdminUsers />}
+        {tab === 'infocards' && <AdminInfoCards />}
       </div>
     </div>
   )
@@ -333,6 +335,164 @@ function EditUserModal({ user, onClose, onSaved }: { user: AdminUser; onClose: (
 
           {error && <p className="text-sm text-red-600">{error}</p>}
 
+          <div className="flex gap-3 pt-2">
+            <button type="button" onClick={onClose}
+              className="flex-1 border border-gray-300 text-gray-700 rounded-lg py-2 text-sm hover:bg-gray-50">
+              Abbrechen
+            </button>
+            <button type="submit" disabled={mutation.isPending}
+              className="flex-1 bg-gray-900 text-white rounded-lg py-2 text-sm font-medium hover:bg-gray-800 disabled:opacity-50">
+              {mutation.isPending ? 'Speichern…' : 'Speichern'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
+// ─── InfoCards Admin ─────────────────────────────────────────────────────────
+
+interface InfoCard {
+  id: string
+  page: string
+  title: string
+  body: string
+  sortOrder: number
+}
+
+function AdminInfoCards() {
+  const qc = useQueryClient()
+  const [editing, setEditing] = useState<InfoCard | null>(null)
+  const [showForm, setShowForm] = useState(false)
+
+  const { data: cards = [] } = useQuery<InfoCard[]>({
+    queryKey: ['info-cards'],
+    queryFn: () => api.get('/info-cards').then(r => r.data),
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => api.delete(`/info-cards/${id}`),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['info-cards'] }),
+  })
+
+  const pageLabel: Record<string, string> = { mitarbeiter: 'Mitarbeiter', kosten: 'Kosten' }
+  const grouped = ['mitarbeiter', 'kosten'].map(page => ({
+    page, label: pageLabel[page] ?? page,
+    cards: cards.filter(c => c.page === page).sort((a, b) => a.sortOrder - b.sortOrder),
+  }))
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-base font-bold text-gray-900">Hinweise & Insights</h2>
+          <p className="text-sm text-gray-500 mt-0.5">Werden in der Sidebar bei Mitarbeiter und Kosten angezeigt</p>
+        </div>
+        <button onClick={() => { setEditing(null); setShowForm(true) }}
+          className="flex items-center gap-1.5 bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800">
+          <Pencil className="w-4 h-4" /> Neuer Hinweis
+        </button>
+      </div>
+
+      {grouped.map(group => (
+        <div key={group.page}>
+          <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-3">{group.label}</h3>
+          {group.cards.length === 0 ? (
+            <p className="text-sm text-gray-400 bg-white border border-dashed border-gray-200 rounded-xl p-4">
+              Noch keine Hinweise für {group.label}
+            </p>
+          ) : (
+            <div className="space-y-3">
+              {group.cards.map(card => (
+                <div key={card.id} className="bg-white border border-gray-200 rounded-xl p-4 flex items-start justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-gray-900">{card.title}</p>
+                    <p className="text-xs text-gray-500 mt-1 whitespace-pre-line">{card.body}</p>
+                    <p className="text-xs text-gray-300 mt-1">Reihenfolge: {card.sortOrder}</p>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button onClick={() => { setEditing(card); setShowForm(true) }}
+                      className="p-2 text-gray-400 hover:text-gray-700"><Pencil className="w-4 h-4" /></button>
+                    <button onClick={() => deleteMutation.mutate(card.id)}
+                      className="p-2 text-gray-400 hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      ))}
+
+      {showForm && (
+        <InfoCardModal
+          initial={editing}
+          onClose={() => { setShowForm(false); setEditing(null) }}
+          onSaved={() => {
+            qc.invalidateQueries({ queryKey: ['info-cards'] })
+            setShowForm(false); setEditing(null)
+          }}
+        />
+      )}
+    </div>
+  )
+}
+
+function InfoCardModal({ initial, onClose, onSaved }:
+  { initial: InfoCard | null; onClose: () => void; onSaved: () => void }) {
+  const isEdit = !!initial
+  const [page, setPage]           = useState(initial?.page ?? 'mitarbeiter')
+  const [title, setTitle]         = useState(initial?.title ?? '')
+  const [body, setBody]           = useState(initial?.body ?? '')
+  const [sortOrder, setSortOrder] = useState(initial?.sortOrder?.toString() ?? '0')
+  const [error, setError]         = useState('')
+
+  const mutation = useMutation({
+    mutationFn: (data: any) => isEdit
+      ? api.patch(`/info-cards/${initial!.id}`, data)
+      : api.post('/info-cards', data),
+    onSuccess: onSaved,
+    onError: (e: any) => setError(e.response?.data?.error ?? 'Fehler'),
+  })
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    mutation.mutate({ page, title, body, sortOrder: parseInt(sortOrder) })
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6">
+        <h2 className="text-base font-bold text-gray-900 mb-5">
+          {isEdit ? 'Hinweis bearbeiten' : 'Neuer Hinweis'}
+        </h2>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">Seite</label>
+              <select value={page} onChange={e => setPage(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900">
+                <option value="mitarbeiter">Mitarbeiter</option>
+                <option value="kosten">Kosten</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">Reihenfolge</label>
+              <input type="number" value={sortOrder} onChange={e => setSortOrder(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900" />
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-700 mb-1">Titel</label>
+            <input value={title} onChange={e => setTitle(e.target.value)} required
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900" />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-700 mb-1">Inhalt</label>
+            <textarea value={body} onChange={e => setBody(e.target.value)} required rows={4}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 resize-none" />
+          </div>
+          {error && <p className="text-sm text-red-600">{error}</p>}
           <div className="flex gap-3 pt-2">
             <button type="button" onClick={onClose}
               className="flex-1 border border-gray-300 text-gray-700 rounded-lg py-2 text-sm hover:bg-gray-50">
