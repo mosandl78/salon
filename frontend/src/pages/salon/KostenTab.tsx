@@ -178,7 +178,7 @@ export default function KostenTab({ salonId, salon, readOnly = false }: { salonI
         <InfoSidebar page="kosten" insights={insights} />
       </div>
 
-    </div> {/* Ende grid */}
+    </div>
   )
 }
 

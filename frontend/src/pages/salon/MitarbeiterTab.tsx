@@ -181,7 +181,7 @@ export default function MitarbeiterTab({ salonId, salon, readOnly = false }: { s
           }}
         />
       )}
-    </div> {/* Ende grid */}
+    </div>
   )
 }
 
