@@ -26,7 +26,7 @@ const CATEGORY_LABEL: Record<CostCategory, string> = {
 function fmt(n: number) { return n.toLocaleString('de-DE') }
 function annual(amounts: number[]) { return amounts.reduce((s, v) => s + v, 0) }
 
-export default function KostenTab({ salonId, salon, readOnly = false }: { salonId: string; salon: Salon; readOnly?: boolean }) {
+export default function KostenTab({ salonId, salon, readOnly = false, onNavigate }: { salonId: string; salon: Salon; readOnly?: boolean; onNavigate?: (tab: string) => void }) {
   const qc = useQueryClient()
   const [editing, setEditing]   = useState<CostItem | null>(null)
   const [showForm, setShowForm] = useState(false)
@@ -57,12 +57,6 @@ export default function KostenTab({ salonId, salon, readOnly = false }: { salonI
 
   const insights = costs.length > 0 && calc ? [
     {
-      title: 'Fixkosten gesamt / Jahr',
-      value: `${fmt(totalJahr)} €`,
-      body: `Ø ${fmt(Math.round(totalJahr / 12))} € / Monat ohne Wareneinsatz`,
-      highlight: true,
-    },
-    {
       title: '3 % Kostensteigerung',
       value: `+ ${fmt(steigerung3pct)} € / Jahr`,
       body: `Erhöht den Mindestumsatz um ${fmt(steigerungMindest)} € / Jahr. Preise sollten regelmäßig angepasst werden.`,
@@ -84,14 +78,14 @@ export default function KostenTab({ salonId, salon, readOnly = false }: { salonI
 
       {/* Hauptinhalt */}
       <div className="lg:col-span-2 space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-stretch gap-3 flex-wrap">
         <div className="bg-white border border-gray-200 rounded-xl px-5 py-3">
           <p className="text-xs text-gray-500">Gesamtkosten / Jahr</p>
           <p className="text-xl font-bold text-gray-900">{fmt(totalJahr)} €</p>
         </div>
         {!readOnly && (
           <button onClick={() => { setEditing(null); setShowForm(true) }}
-            className="flex items-center gap-1.5 bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800">
+            className="flex items-center gap-1.5 bg-gray-900 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-gray-800 shrink-0">
             <Plus className="w-4 h-4" /> Kostenposition hinzufügen
           </button>
         )}
@@ -175,7 +169,7 @@ export default function KostenTab({ salonId, salon, readOnly = false }: { salonI
 
       {/* Sidebar */}
       <div className="lg:col-span-1">
-        <InfoSidebar page="kosten" insights={insights} />
+        <InfoSidebar page="kosten" insights={insights} onSimulation={onNavigate ? () => onNavigate('simulator') : undefined} />
       </div>
 
     </div>

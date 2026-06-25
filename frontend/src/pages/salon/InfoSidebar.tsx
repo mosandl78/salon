@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query'
-import { Lightbulb } from 'lucide-react'
 import api from '../../api'
 
 interface InfoCard {
@@ -19,9 +18,10 @@ interface InsightCard {
 interface Props {
   page: 'mitarbeiter' | 'kosten'
   insights: InsightCard[]
+  onSimulation?: () => void
 }
 
-export default function InfoSidebar({ page, insights }: Props) {
+export default function InfoSidebar({ page, insights, onSimulation }: Props) {
   const { data: cards = [] } = useQuery<InfoCard[]>({
     queryKey: ['info-cards', page],
     queryFn: () => api.get(`/info-cards?page=${page}`).then(r => r.data),
@@ -29,10 +29,13 @@ export default function InfoSidebar({ page, insights }: Props) {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        <Lightbulb className="w-4 h-4 text-amber-500" />
-        <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400">Insights & Hinweise</h3>
-      </div>
+      {onSimulation && (
+        <button onClick={onSimulation}
+          className="w-full text-left bg-white border border-gray-200 rounded-2xl px-4 py-3 hover:bg-gray-50 transition-colors">
+          <p className="text-xs text-gray-500">Was wäre wenn …?</p>
+          <p className="text-xl font-bold text-gray-900">Simulation →</p>
+        </button>
+      )}
 
       {/* Dynamische Einblicke */}
       {insights.map((insight, i) => (

@@ -217,8 +217,8 @@ export default function SalonPage() {
       {/* Content */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
         {tab === 'uebersicht'  && !wizardStep && <UebersichtTab salonId={id!} salon={salon} onNavigate={setTab} onStartWizard={startWizard} />}
-        {(tab === 'mitarbeiter' || wizardStep === 1) && <MitarbeiterTab salonId={id!} salon={salon} />}
-        {(tab === 'kosten'      || wizardStep === 2) && <KostenTab      salonId={id!} salon={salon} />}
+        {(tab === 'mitarbeiter' || wizardStep === 1) && <MitarbeiterTab salonId={id!} salon={salon} onNavigate={setTab} />}
+        {(tab === 'kosten'      || wizardStep === 2) && <KostenTab      salonId={id!} salon={salon} onNavigate={setTab} />}
         {(tab === 'preise'      || wizardStep === 3) && <PreiseTab      salonId={id!} salon={salon} />}
         {tab === 'lohnfaktor'  && !wizardStep && <LohnfaktorTab  salonId={id!} salon={salon} />}
         {tab === 'simulator'   && !wizardStep && <SimulatorTab   salonId={id!} salon={salon} />}

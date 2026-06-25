@@ -17,7 +17,7 @@ function fmt(n: number) { return n.toLocaleString('de-DE') }
 
 const MONTH_NAMES = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez']
 
-export default function MitarbeiterTab({ salonId, salon, readOnly = false }: { salonId: string; salon: Salon; readOnly?: boolean }) {
+export default function MitarbeiterTab({ salonId, salon, readOnly = false, onNavigate }: { salonId: string; salon: Salon; readOnly?: boolean; onNavigate?: (tab: string) => void }) {
   const qc = useQueryClient()
   const [editing, setEditing]   = useState<Employee | null>(null)
   const [showForm, setShowForm] = useState(false)
@@ -50,12 +50,6 @@ export default function MitarbeiterTab({ salonId, salon, readOnly = false }: { s
 
   const insights = employees.length > 0 && calc ? [
     {
-      title: 'Gesamtkosten Personal inkl. AG-Anteil',
-      value: `${fmt(totalMitPK)} € / Jahr`,
-      body: `Bruttolöhne + ${(employerRate * 100).toFixed(1)} % AG-Sozialversicherungsanteil`,
-      highlight: true,
-    },
-    {
       title: 'Weiterer Mitarbeiter (Ø-Gehalt)',
       value: `+ ${fmt(neuerMAKosten)} € / Jahr`,
       body: `Bei Ø ${fmt(Math.round(avgGross))} € Brutto/Monat — Mindestumsatz steigt entsprechend.`,
@@ -77,30 +71,26 @@ export default function MitarbeiterTab({ salonId, salon, readOnly = false }: { s
 
       {/* Hauptinhalt */}
       <div className="lg:col-span-2 space-y-6">
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex items-stretch gap-3 flex-wrap">
           {employees.length > 0 && (
-            <div className="flex gap-3 flex-wrap">
+            <>
               <div className="bg-white border border-gray-200 rounded-xl px-4 py-3">
-                <p className="text-xs text-gray-500">Mitarbeiter gesamt</p>
+                <p className="text-xs text-gray-500">Mitarbeiter</p>
                 <p className="text-xl font-bold text-gray-900">{employees.length}</p>
-              </div>
-              <div className="bg-white border border-gray-200 rounded-xl px-4 py-3">
-                <p className="text-xs text-gray-500">Produktiv</p>
-                <p className="text-xl font-bold text-gray-900">{productive.length}</p>
               </div>
               <div className="bg-white border border-gray-200 rounded-xl px-4 py-3">
                 <p className="text-xs text-gray-500">Bruttolöhne / Jahr</p>
                 <p className="text-xl font-bold text-gray-900">{fmt(totalBrutto)} €</p>
               </div>
-              <div className="bg-gray-900 text-white rounded-xl px-4 py-3">
-                <p className="text-xs text-gray-400">inkl. AG-Anteil / Jahr</p>
-                <p className="text-xl font-bold">{fmt(totalMitPK)} €</p>
+              <div className="bg-white border border-gray-200 rounded-xl px-4 py-3">
+                <p className="text-xs text-gray-500">inkl. AG-Anteil / Jahr</p>
+                <p className="text-xl font-bold text-gray-900">{fmt(totalMitPK)} €</p>
               </div>
-            </div>
+            </>
           )}
           {!readOnly && (
             <button onClick={() => { setEditing(null); setShowForm(true) }}
-              className="flex items-center gap-1.5 bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 shrink-0">
+              className="flex items-center gap-1.5 bg-gray-900 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-gray-800 shrink-0">
               <Plus className="w-4 h-4" /> Mitarbeiter hinzufügen
             </button>
           )}
@@ -165,7 +155,7 @@ export default function MitarbeiterTab({ salonId, salon, readOnly = false }: { s
 
       {/* Sidebar */}
       <div className="lg:col-span-1">
-        <InfoSidebar page="mitarbeiter" insights={insights} />
+        <InfoSidebar page="mitarbeiter" insights={insights} onSimulation={onNavigate ? () => onNavigate('simulator') : undefined} />
       </div>
 
       {showForm && (
