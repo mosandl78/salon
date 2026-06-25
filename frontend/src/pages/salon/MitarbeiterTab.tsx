@@ -48,23 +48,11 @@ export default function MitarbeiterTab({ salonId, salon, readOnly = false, onNav
   const lohnErhoehung10  = Math.round(totalBrutto * 0.1 * (1 + employerRate))
   const krankenquote5    = calc ? Math.round(calc.pkProMinute * (productive.length * 8 * 220 * 60) * 0.05) : 0
 
-  const insights = employees.length > 0 && calc ? [
-    {
-      title: 'Weiterer Mitarbeiter (Ø-Gehalt)',
-      value: `+ ${fmt(neuerMAKosten)} € / Jahr`,
-      body: `Bei Ø ${fmt(Math.round(avgGross))} € Brutto/Monat — Mindestumsatz steigt entsprechend.`,
-    },
-    {
-      title: '10 % Lohnerhöhung für alle',
-      value: `+ ${fmt(lohnErhoehung10)} € / Jahr`,
-      body: 'Wirkung auf Personalkosten inkl. AG-Anteil. Preise müssten entsprechend angepasst werden.',
-    },
-    {
-      title: '5 % Krankenquote (Produktivkräfte)',
-      value: `− ${fmt(krankenquote5)} € Deckungsbeitrag`,
-      body: 'Produktive Stunden fallen weg — der Mindestumsatz muss trotzdem erwirtschaftet werden.',
-    },
-  ] : []
+  const computedValues: Record<string, string> = employees.length > 0 && calc ? {
+    neuer_ma: `+ ${fmt(neuerMAKosten)} € / Jahr`,
+    lohnerhoehung_10: `+ ${fmt(lohnErhoehung10)} € / Jahr`,
+    krankenquote_5: `− ${fmt(krankenquote5)} € Deckungsbeitrag`,
+  } : {}
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
@@ -155,7 +143,7 @@ export default function MitarbeiterTab({ salonId, salon, readOnly = false, onNav
 
       {/* Sidebar */}
       <div className="lg:col-span-1">
-        <InfoSidebar page="mitarbeiter" insights={insights} onSimulation={onNavigate ? () => onNavigate('simulator') : undefined} />
+        <InfoSidebar page="mitarbeiter" computedValues={computedValues} onSimulation={onNavigate ? () => onNavigate('simulator') : undefined} />
       </div>
 
       {showForm && (

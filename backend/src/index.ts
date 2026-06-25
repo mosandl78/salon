@@ -13,7 +13,7 @@ import { openingHoursRouter } from './routes/opening-hours'
 import { calculationRouter }  from './routes/calculation'
 import { adminRouter }        from './routes/admin'
 import { demoRouter }         from './routes/demo'
-import { infoCardsRouter }    from './routes/infoCards'
+import { infoCardsRouter, seedSystemInfoCards } from './routes/infoCards'
 import { contactRouter }      from './routes/contact'
 import { requireNotDemo }     from './middleware/demo'
 
@@ -46,4 +46,7 @@ app.use('/api/contact', contactRouter)
 
 app.get('/api/health', (_, res) => res.json({ ok: true, service: 'salon-api' }))
 
-app.listen(PORT, () => console.log(`🪒 Salon API läuft auf Port ${PORT}`))
+app.listen(PORT, async () => {
+  console.log(`🪒 Salon API läuft auf Port ${PORT}`)
+  await seedSystemInfoCards()
+})

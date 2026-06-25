@@ -359,6 +359,7 @@ interface InfoCard {
   title: string
   body: string
   sortOrder: number
+  computedKey?: string | null
 }
 
 function AdminInfoCards() {
@@ -407,15 +408,28 @@ function AdminInfoCards() {
               {group.cards.map(card => (
                 <div key={card.id} className="bg-white border border-gray-200 rounded-xl p-4 flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-gray-900">{card.title}</p>
-                    <p className="text-xs text-gray-500 mt-1 whitespace-pre-line">{card.body}</p>
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <p className="text-sm font-semibold text-gray-900">{card.title}</p>
+                      {card.computedKey && (
+                        <span className="text-xs font-medium bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded">System</span>
+                      )}
+                    </div>
+                    {card.computedKey && (
+                      <p className="text-xs text-gray-400 font-mono mb-1">{card.computedKey}</p>
+                    )}
+                    <p className="text-xs text-gray-500 whitespace-pre-line">{card.body}</p>
                     <p className="text-xs text-gray-300 mt-1">Reihenfolge: {card.sortOrder}</p>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     <button onClick={() => { setEditing(card); setShowForm(true) }}
                       className="p-2 text-gray-400 hover:text-gray-700"><Pencil className="w-4 h-4" /></button>
-                    <button onClick={() => deleteMutation.mutate(card.id)}
-                      className="p-2 text-gray-400 hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
+                    {card.computedKey ? (
+                      <button disabled title="Systemkarten können nicht gelöscht werden"
+                        className="p-2 text-gray-200 cursor-not-allowed"><Trash2 className="w-4 h-4" /></button>
+                    ) : (
+                      <button onClick={() => deleteMutation.mutate(card.id)}
+                        className="p-2 text-gray-400 hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
+                    )}
                   </div>
                 </div>
               ))}
@@ -441,6 +455,7 @@ function AdminInfoCards() {
 function InfoCardModal({ initial, onClose, onSaved }:
   { initial: InfoCard | null; onClose: () => void; onSaved: () => void }) {
   const isEdit = !!initial
+  const isSystem = !!initial?.computedKey
   const [page, setPage]           = useState(initial?.page ?? 'mitarbeiter')
   const [title, setTitle]         = useState(initial?.title ?? '')
   const [body, setBody]           = useState(initial?.body ?? '')
@@ -463,15 +478,23 @@ function InfoCardModal({ initial, onClose, onSaved }:
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6">
-        <h2 className="text-base font-bold text-gray-900 mb-5">
+        <h2 className="text-base font-bold text-gray-900 mb-5 flex items-center gap-2">
           {isEdit ? 'Hinweis bearbeiten' : 'Neuer Hinweis'}
+          {isSystem && <span className="text-xs font-medium bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded">System</span>}
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
+          {isSystem && initial?.computedKey && (
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">Computed Key (schreibgeschützt)</label>
+              <input value={initial.computedKey} readOnly
+                className="w-full border border-gray-200 bg-gray-50 rounded-lg px-3 py-2 text-sm font-mono text-gray-500" />
+            </div>
+          )}
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-1">Seite</label>
-              <select value={page} onChange={e => setPage(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900">
+              <select value={page} onChange={e => setPage(e.target.value)} disabled={isSystem}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 disabled:bg-gray-50 disabled:text-gray-500">
                 <option value="mitarbeiter">Mitarbeiter</option>
                 <option value="kosten">Kosten</option>
               </select>

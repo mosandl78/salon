@@ -55,23 +55,11 @@ export default function KostenTab({ salonId, salon, readOnly = false, onNavigate
   const steigerungMindest = wareneinsatzRate < 1 ? Math.round(steigerung3pct / (1 - wareneinsatzRate)) : steigerung3pct
   const miete            = costs.filter(c => c.category === 'MIETE').reduce((s, c) => s + annual(c.amounts), 0)
 
-  const insights = costs.length > 0 && calc ? [
-    {
-      title: '3 % Kostensteigerung',
-      value: `+ ${fmt(steigerung3pct)} € / Jahr`,
-      body: `Erhöht den Mindestumsatz um ${fmt(steigerungMindest)} € / Jahr. Preise sollten regelmäßig angepasst werden.`,
-    },
-    ...(miete > 0 ? [{
-      title: 'Anteil Raumkosten',
-      value: `${((miete / totalJahr) * 100).toFixed(1)} %`,
-      body: `${fmt(miete)} € / Jahr. Branchenüblich sind 10–15 % der Gesamtkosten.`,
-    }] : []),
-    {
-      title: '1 € Fixkosten braucht…',
-      value: `${(1 / (1 - wareneinsatzRate)).toFixed(2)} € Umsatz`,
-      body: `Bei ${(wareneinsatzRate * 100).toFixed(0)} % Wareneinsatz-Quote musst du ${(1 / (1 - wareneinsatzRate)).toFixed(2)} € einnehmen um 1 € Fixkosten zu decken.`,
-    },
-  ] : []
+  const computedValues: Record<string, string> = costs.length > 0 && calc ? {
+    kostensteigerung_3: `+ ${fmt(steigerung3pct)} € / Jahr`,
+    ...(miete > 0 ? { raumkosten_anteil: `${((miete / totalJahr) * 100).toFixed(1)} %` } : {}),
+    fixkosten_euro: `${(1 / (1 - wareneinsatzRate)).toFixed(2)} € Umsatz`,
+  } : {}
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
@@ -169,7 +157,7 @@ export default function KostenTab({ salonId, salon, readOnly = false, onNavigate
 
       {/* Sidebar */}
       <div className="lg:col-span-1">
-        <InfoSidebar page="kosten" insights={insights} onSimulation={onNavigate ? () => onNavigate('simulator') : undefined} />
+        <InfoSidebar page="kosten" computedValues={computedValues} onSimulation={onNavigate ? () => onNavigate('simulator') : undefined} />
       </div>
 
     </div>

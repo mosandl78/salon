@@ -173,11 +173,12 @@ model ActualRevenue {
 }
 
 model InfoCard {
-  id        String   @id @default(cuid())
-  page      String   // 'mitarbeiter' | 'kosten'
-  title     String
-  body      String
-  sortOrder Int      @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  page        String   // 'mitarbeiter' | 'kosten'
+  title       String
+  body        String
+  sortOrder   Int      @default(0)
+  computedKey String?  @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
